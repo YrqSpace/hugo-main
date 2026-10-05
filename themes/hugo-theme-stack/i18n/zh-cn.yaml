@@ -61,7 +61,4 @@ search:
 
 footer:
     builtWith:
-        other: 使用 {{ .Generator }} 构建
-
-    designedBy:
-        other: 主题 {{ .Theme }} 由 {{ .DesignedBy }} 设计
+        other: Build using Hugo

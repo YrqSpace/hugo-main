@@ -1,5 +1,5 @@
 ---
-title: 关于
+title: "关于"
 menu:
     main: 
         weight: -90
@@ -7,4 +7,7 @@ menu:
             icon: user
 ---
 
-This is a test page for i18n support.
+我是爱玩win11的me，一名热爱编程的学生。
+这个博客是我记录生活搭的
+GitHub 上的 yrqspace 是我折腾各种项目的地方，欢迎来看看。
+如果你有想交流的话题，欢迎留言，一起进步。

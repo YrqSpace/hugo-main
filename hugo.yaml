@@ -1,7 +1,7 @@
 baseurl: https://yrqspace.github.io/
 languageCode: en-us
 theme: hugo-theme-stack
-paginate: 3
+paginate: 5
 title: Example Site
 copyright: 爱玩win11的me
 
@@ -67,7 +67,7 @@ params:
 
     comments:
         enabled: true
-        provider: disqus
+        provider: waline
 
         disqusjs:
             shortname:
@@ -102,11 +102,11 @@ params:
 
         # Waline client configuration see: https://waline.js.org/en/reference/component.html
         waline:
-            serverURL:
-            lang:
+            serverURL: https://yrq1622.cc.cd
+            lang: zh-CN
             pageview:
             emoji:
-                - https://unpkg.com/@waline/emojis@1.0.1/weibo
+                - https://cdn.jsdmirror.com/npm/@waline/emojis@1.0.1/weibo
             requiredMeta:
                 - name
                 - email
@@ -128,15 +128,18 @@ params:
             siteName: "" # You must insert a unique identifier here matching the one you registered (See https://cactus.chat/docs/getting-started/quick-start/#register-your-site)
 
         giscus:
-            repo:
-            repoID:
-            category:
-            categoryID:
-            mapping:
-            lightTheme:
-            darkTheme:
+            repo: YrqSpace/Giscus
+            repoID: R_kgDOUhG6JA
+            category: Announcements
+            categoryID: DIC_kwDOUhG6JM4DF78m
+            mapping: pathname
+            strict: 0
             reactionsEnabled: 1
             emitMetadata: 0
+            inputPosition: top
+            lightTheme: light
+            darkTheme: dark
+            lang: zh-CN
 
         gitalk:
             owner:
@@ -150,6 +153,7 @@ params:
             id:
     widgets:
         homepage:
+            - type: clock
             - type: search
             - type: archives
               params:
@@ -196,7 +200,7 @@ menu:
     social:
         - identifier: github
           name: GitHub
-          url: https://github.com/CaiJimmy/hugo-theme-stack
+          url: https://github.com/YrqSpace
           params:
               icon: brand-github
 

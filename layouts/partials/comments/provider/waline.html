@@ -1,0 +1,48 @@
+{{- /* ----------------------------------------------------------------
+     Waline 评论容器 + 样式（覆盖主题模板，不改 themes/ 源码）
+
+     本文件修复两个问题：
+
+     1. “字体太小”
+        主题把 html 根字号设为 62.5%（即 1rem = 10px）。Waline 默认
+        --waline-font-size: 1rem，于是评论字号被压到 10px，特别小。
+        主题原版会在评论容器上写 --waline-font-size: var(--article-font-size)
+        （正文 16px / 宽屏 17px），但之前的覆盖版把这条删掉了。
+        这里重新加上，让评论字体跟随正文。
+
+     2. “有些字体不对”
+        input / textarea / button / select 这类表单控件默认不会继承页面
+        字体，会退回浏览器默认 UI 字体；Waline 自身 CSS 也没给它们设定
+        font-family，导致输入框、按钮和站点字体不一致。这里统一强制继承
+        站点字体（--article-font-family / --base-font-family）。
+
+     说明：客户端 JS/CSS 与初始化仍统一放在 footer/pjax.html 中处理，
+     这样整页加载与 PJAX 无刷新切换都能正确挂载 Waline。这里只输出
+     容器与样式。
+----------------------------------------------------------------- */ -}}
+{{- with .Site.Params.comments.waline -}}
+<style>
+    .waline-container {
+        background-color: var(--card-background);
+        border-radius: var(--card-border-radius);
+        box-shadow: var(--shadow-l1);
+        padding: var(--card-padding);
+        /* 关键①：让评论字号跟随正文，而非 Waline 默认的 1rem(=10px) */
+        --waline-font-size: var(--article-font-size, 1.6rem);
+    }
+
+    /* 关键②：表单控件默认不继承字体，统一强制继承站点字体，修复“字体不对” */
+    .waline-container,
+    .waline-container input,
+    .waline-container textarea,
+    .waline-container button,
+    .waline-container select {
+        font-family: var(--article-font-family, var(--base-font-family));
+    }
+
+    .waline-container .wl-count {
+        color: var(--card-text-color-main);
+    }
+</style>
+<div id="waline" class="waline-container"></div>
+{{- end -}}

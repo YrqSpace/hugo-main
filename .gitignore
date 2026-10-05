@@ -1,7 +1,12 @@
 # 自动生成的文件
-public
-resources
+public/
+resources/
 .hugo_build.lock
 
 # hugo命令
 hugo.exe
+
+# 系统与编辑器
+.DS_Store
+Thumbs.db
+Desktop.ini

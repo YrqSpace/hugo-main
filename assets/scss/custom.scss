@@ -1,0 +1,101 @@
+@import "aplayer-dark.scss";
+@import "aplayer-light.scss";
+
+
+#dark-mode-toggle{
+    margin-bottom: 50px
+}
+
+
+@media (min-width: 1024px) {
+  .article-list--compact {
+    display: grid;
+    // 目前是两列，如需三列，则后面再加一个1fr，以此类推
+    grid-template-columns: 1fr 1fr;
+    background: none;
+    box-shadow: none;
+    gap: 1rem;
+
+    article {
+      background: var(--card-background);
+      border: none;
+      box-shadow: var(--shadow-l2);
+      margin-bottom: 8px;
+      margin-right: 8px;
+      border-radius: 16px;
+    }
+  }
+}
+
+
+/* ================= 侧栏交互动画 ================= */
+/* 只动 transform，缓动无过冲；悬停项提升层级、容器不裁剪，
+   避免放大后被相邻元素或容器边缘遮住 */
+
+/* 1) 社交图标（Bilibili / GitHub）：常态静止；悬停平顺转一整圈并轻微放大 */
+.menu-social li a svg {
+  display: inline-block;
+  transform: rotate(0deg) scale(1);
+  transform-origin: 50% 50%;
+  transition: transform .6s cubic-bezier(.25, .1, .25, 1);
+}
+.menu-social li a:hover svg {
+  transform: rotate(360deg) scale(1.1);
+}
+
+/* 桌面端：菜单容器不裁剪，放大后的菜单项不会被容器边缘“切掉” */
+@media (min-width: 768px) {
+  #main-menu {
+    overflow: visible;
+  }
+}
+
+/* 2) 主导航菜单（主页 / 关于 / 归档 / 搜索 / 友情链接）：悬停平滑放大 */
+#main-menu > li > a {
+  position: relative;                 /* 允许设置层级 */
+  transform-origin: left center;
+  transition: transform .28s cubic-bezier(.25, .1, .25, 1);
+}
+#main-menu > li > a:hover {
+  transform: scale(1.05);
+  z-index: 3;                         /* 悬停项绘制在相邻元素之上，不会被遮住 */
+}
+
+/* 3) 暗色模式开关：仅悬停平滑放大一点（不做翻转、不换按钮） */
+#dark-mode-toggle {
+  position: relative;
+  transform-origin: left center;
+  transition: transform .28s cubic-bezier(.25, .1, .25, 1);
+}
+#dark-mode-toggle:hover {
+  transform: scale(1.05);
+  z-index: 3;
+}
+
+/* 4) 回到顶部按钮（#backTopBtn）：与社交图标一致，常态静止，悬停转一圈并轻微放大 */
+#backTopBtn {
+  transform-origin: 50% 50%;
+  transition: transform .6s cubic-bezier(.25, .1, .25, 1);
+}
+#backTopBtn:hover {
+  transform: rotate(360deg) scale(1.1);
+}
+
+/* 5) 文章卡片：鼠标悬停时卡片内的封面图片放大，
+   但被卡片自身边框裁切（overflow:hidden + 圆角），类似 Hexo 效果 */
+.article-list article,
+.article-list--compact article {
+  .article-image {
+    overflow: hidden;                 /* 图片放大后只在卡片图片区内显示 */
+  }
+
+  .article-image img {
+    transform: scale(1);
+    transform-origin: 50% 50%;
+    transition: transform .45s cubic-bezier(.25, .1, .25, 1);
+  }
+
+  &:hover .article-image img {
+    transform: scale(1.08);           /* 悬停放大，超出部分被卡片边框裁掉 */
+  }
+}

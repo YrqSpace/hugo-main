@@ -1,0 +1,227 @@
+{{- /*
+  右下角欢迎通知（适配 hugo-theme-stack，自动适配明/暗色）
+  - 自动识别访客浏览器并填入问候语
+  - “点这里去 GitHub 订阅” 链接地址在下方 $subscribeURL 处修改
+  - 首次访问弹出；同标签页刷新不再弹；关掉标签页再打开会重新弹（sessionStorage）
+*/ -}}
+{{- $subscribeURL := "https://github.com/YrqSpace/YrqSpace.github.io/issues/1" -}}
+
+<style>
+    .welcome-toast {
+        position: fixed;
+        right: 20px;
+        bottom: 20px;
+        z-index: 9999;
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        max-width: 440px;
+        padding: 16px 38px 16px 16px;
+        background: var(--card-background);
+        color: var(--card-text-color-main);
+        border: 1px solid var(--card-separator-color);
+        border-radius: var(--card-border-radius, 12px);
+        box-shadow: 0 10px 34px rgba(0, 0, 0, 0.18);
+        transform: translateX(130%);
+        opacity: 0;
+        pointer-events: none;
+        transition: transform 0.55s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.45s ease;
+    }
+
+    .welcome-toast.is-show {
+        transform: translateX(0);
+        opacity: 1;
+        pointer-events: auto;
+    }
+
+    .welcome-toast__wave {
+        flex-shrink: 0;
+        font-size: 4rem;
+        line-height: 1;
+        display: inline-block;
+        transform-origin: 70% 70%;
+        animation: welcome-wave 1.8s ease-in-out infinite;
+    }
+
+    @keyframes welcome-wave {
+
+        0%,
+        100% {
+            transform: rotate(0deg);
+        }
+
+        20% {
+            transform: rotate(18deg);
+        }
+
+        40% {
+            transform: rotate(-10deg);
+        }
+
+        60% {
+            transform: rotate(14deg);
+        }
+
+        80% {
+            transform: rotate(-6deg);
+        }
+    }
+
+    .welcome-toast__body {
+        min-width: 0;
+    }
+
+    .welcome-toast__greet {
+        margin: 0 0 8px;
+        font-size: 1.4rem;
+        line-height: 1.55;
+        color: var(--card-text-color-main);
+    }
+
+    .welcome-toast__greet b {
+        color: var(--accent-color);
+        font-weight: 600;
+    }
+
+    .welcome-toast__link {
+        display: inline-block;
+        font-size: 1.3rem;
+        line-height: 1.5;
+        white-space: nowrap;
+        color: var(--accent-color);
+        text-decoration: none !important;
+        border-bottom: 1px dashed var(--accent-color);
+        padding-bottom: 1px;
+        transition: opacity 0.2s ease;
+    }
+
+    .welcome-toast__link:hover {
+        opacity: 0.75;
+    }
+
+    .welcome-toast__close {
+        position: absolute;
+        top: 8px;
+        right: 10px;
+        width: 22px;
+        height: 22px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0;
+        border: none;
+        background: none;
+        color: var(--card-text-color-secondary);
+        font-size: 1.8rem;
+        line-height: 1;
+        cursor: pointer;
+        transition: color 0.2s ease, transform 0.2s ease;
+    }
+
+    .welcome-toast__close:hover {
+        color: var(--card-text-color-main);
+        transform: scale(1.15);
+    }
+
+    @media (max-width: 640px) {
+        .welcome-toast {
+            left: 12px;
+            right: 12px;
+            bottom: 12px;
+            max-width: none;
+        }
+    }
+</style>
+
+<div id="welcome-toast" class="welcome-toast" role="dialog" aria-live="polite" aria-label="欢迎通知">
+    <button class="welcome-toast__close" type="button" aria-label="关闭">&times;</button>
+    <span class="welcome-toast__wave" aria-hidden="true">👋</span>
+    <div class="welcome-toast__body">
+        <p class="welcome-toast__greet">泥嚎！来自 <b id="welcome-browser">你的浏览器</b> 的朋友，欢迎来到我的 blog</p>
+        <a class="welcome-toast__link" href="{{ $subscribeURL }}" target="_blank" rel="noopener">👉 觉得文章有意思？点这里去 GitHub 订阅</a>
+    </div>
+</div>
+
+<script>
+    (function () {
+        function detectBrowser() {
+            var ua = navigator.userAgent;
+            if (/Edg\//.test(ua) || /EdgiOS\//.test(ua)) return 'Edge';
+            if (/OPR\//.test(ua) || /Opera/.test(ua)) return 'Opera';
+            if (/Firefox\//.test(ua) || /FxiOS\//.test(ua)) return 'Firefox';
+            if (/Chrome\//.test(ua) || /CriOS\//.test(ua)) return 'Chrome';
+            if (/Safari\//.test(ua)) return 'Safari';
+            return '浏览器';
+        }
+
+        // 用 sessionStorage 控制：
+        //   首次访问 → 弹出；同标签页刷新 → 不弹；关掉标签页再打开 → 重新弹
+        var KEY = 'welcome-shown';
+
+        function alreadyShown() {
+            try { return sessionStorage.getItem(KEY) === '1'; } catch (e) { return false; }
+        }
+
+        function markShown() {
+            try { sessionStorage.setItem(KEY, '1'); } catch (e) { }
+        }
+
+        function showWelcome() {
+            var toast = document.getElementById('welcome-toast');
+            if (!toast) return;
+
+            // 本标签页已弹过（例如刷新）→ 不再显示
+            if (alreadyShown()) return;
+
+            var browserSpan = document.getElementById('welcome-browser');
+            if (browserSpan) browserSpan.textContent = detectBrowser();
+
+            var closeBtn = toast.querySelector('.welcome-toast__close');
+            if (closeBtn) {
+                closeBtn.addEventListener('click', function () {
+                    toast.classList.remove('is-show');
+                });
+            }
+
+            // 等加载页结束（html.is-loading 被移除）后再弹出，避免欢迎弹窗先于加载动画出现
+            function reveal() {
+                toast.classList.add('is-show');
+                markShown();
+            }
+
+            function loadingDone() {
+                return !document.documentElement.classList.contains('is-loading');
+            }
+
+            if (loadingDone()) {
+                setTimeout(reveal, 300);
+                return;
+            }
+
+            var done = false;
+            var observer = new MutationObserver(function () {
+                if (!done && loadingDone()) {
+                    done = true;
+                    observer.disconnect();
+                    setTimeout(reveal, 300);
+                }
+            });
+            observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+
+            // 兜底：最多等待 20 秒，避免异常情况下弹窗不出现
+            setTimeout(function () {
+                if (!done) {
+                    done = true;
+                    observer.disconnect();
+                    reveal();
+                }
+            }, 20000);
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', showWelcome);
+        } else {
+            showWelcome();
+        }
+    })();
+</script>

@@ -323,4 +323,6 @@ window.addEventListener('load', () => {
     }, 0);
 })
 
+
+
 export default Search;

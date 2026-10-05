@@ -1,0 +1,238 @@
+{{- /* ------------------------------------------------------------------
+   PJAX 无刷新导航
+
+   之前的写法有一个致命错误：出现了重复的 <script> 开始标签，
+   <script> 内部是"原始文本"，里面的 <script> 不会被当作新标签，
+   导致整段初始化脚本被当成文本、JS 直接语法报错，Pjax 永远初始化不了。
+
+   另外做了两点加固：
+   1) 改为自托管 pjax 库（static/js/pjax.min.js），避免 CDN 加载慢时
+      前若干秒点击都会整页刷新；若库缺失则安全降级为普通跳转。
+   2) handleResponse 里同步 <body> 的 class，且无论响应是整页 HTML
+      还是局部 HTML，都交回库的原始逻辑处理（原 else 分支是空的，
+      会导致部分点击没有任何反应）。
+
+   本次修复（评论系统“刷新后不显示”）：
+   原加载器在动态 import 之前就把容器标记成"已挂载"并清空 innerHTML。
+   一旦模块加载慢或那一次 import 失败，容器会永久空白且以后不再重试。
+   现在改为：
+   - 复用同一个模块 Promise，避免重复下载；
+   - 容器暂不存在时定时重试（而不是直接放弃）；
+   - 用 wlMounting 标志防止并发重复 init；
+   - 只有在 init() 真正成功之后才标记 wlMounted='1'；
+   - 加载失败时清空 Promise 缓存，下一次仍可重试。
+
+   注意：使用前请确认 pjax 库文件已放在 static/js/pjax.min.js。
+------------------------------------------------------------------- */ -}}
+
+{{- /* 1. 加载 pjax 库（自托管，加载快、稳定） */ -}}
+<script src="{{ "js/pjax.min.js" | relURL }}"></script>
+
+{{- /* 2. 加载本地 topbar 进度条脚本 */ -}}
+{{ with resources.Get "js/topbar.min.js" }}
+<script src="{{ .RelPermalink }}"></script>
+{{ end }}
+
+{{- with .Site.Params.comments.giscus -}}
+<script>
+  window.__giscusConfig = {
+    repo: {{ .repo | jsonify | safeJS }},
+    repoId: {{ .repoID | jsonify | safeJS }},
+    category: {{ .category | jsonify | safeJS }},
+    categoryId: {{ .categoryID | jsonify | safeJS }},
+    mapping: {{ default "title" .mapping | jsonify | safeJS }},
+    strict: {{ default 0 .strict | jsonify | safeJS }},
+    reactionsEnabled: {{ default 1 .reactionsEnabled | jsonify | safeJS }},
+    emitMetadata: {{ default 0 .emitMetadata | jsonify | safeJS }},
+    inputPosition: {{ default "top" .inputPosition | jsonify | safeJS }},
+    lightTheme: {{ default "light" .lightTheme | jsonify | safeJS }},
+    darkTheme: {{ default "dark_dimmed" .darkTheme | jsonify | safeJS }},
+    lang: {{ default "en" .lang | jsonify | safeJS }}
+  };
+</script>
+{{- end -}}
+
+{{- /* 2.5 Waline：自托管客户端 + 初始化加载器（整页加载与 PJAX 切换后均可复用） */ -}}
+{{- with .Site.Params.comments.waline -}}
+{{- $config := dict "el" "#waline" "dark" "html[data-scheme=\"dark\"]" -}}
+{{- $replaceKeys := dict "serverurl" "serverURL" "requiredmeta" "requiredMeta" "wordlimit" "wordLimit" "pagesize" "pageSize" "imageuploader" "imageUploader" "texrenderer" "texRenderer" "commentsorting" "commentSorting" "recaptchav3key" "recaptchaV3Key" "turnstilekey" "turnstileKey" -}}
+{{- $replaceLocaleKeys := dict "reactiontitle" "reactionTitle" "gifsearchplaceholder" "gifSearchPlaceholder" "nickerror" "nickError" "mailerror" "mailError" "wordhint" "wordHint" "cancellike" "cancelLike" "cancelreply" "cancelReply" "uploadimage" "uploadImage" -}}
+{{- range $key, $val := . -}}
+  {{- if ne $val nil -}}
+  {{- $replaceKey := index $replaceKeys $key -}}
+  {{- $k := default $key $replaceKey -}}
+  {{- if eq $k "locale" -}}
+  {{- $locale := dict -}}
+  {{- range $lkey, $lval := $val -}}
+  {{- if ne $lval nil -}}
+  {{- $replaceLKey := index $replaceLocaleKeys $lkey -}}
+  {{- $lk := default $lkey $replaceLKey -}}
+  {{- $locale = merge $locale (dict $lk $lval) -}}
+  {{- end -}}
+  {{- end -}}
+  {{- $config = merge $config (dict $k $locale) -}}
+  {{- else -}}
+  {{- $config = merge $config (dict $k $val) -}}
+  {{- end -}}
+  {{- end -}}
+{{- end -}}
+<link rel="stylesheet" href="{{ "vendor/waline/waline.css" | relURL }}">
+<script>
+window.__walineCfg = {{ $config | jsonify | safeJS }};
+(function () {
+  var WALINE_URL = '{{ "vendor/waline/waline.js" | relURL }}';
+  var bootAttempts = 0;
+
+  function loadModule() {
+    // 只下载一次，PJAX 切换时复用同一 Promise
+    if (!window.__walineModulePromise) {
+      window.__walineModulePromise = import(WALINE_URL);
+    }
+    return window.__walineModulePromise;
+  }
+
+  window.__walineBoot = function () {
+    var el = document.getElementById('waline');
+    if (!el) {
+      // 容器还没出现：稍后重试，避免永久空白
+      if (bootAttempts < 40) {
+        bootAttempts++;
+        setTimeout(window.__walineBoot, 200);
+      }
+      return;
+    }
+    if (el.dataset.wlMounted === '1' || el.dataset.wlMounting === '1') return;
+
+    el.dataset.wlMounting = '1';
+    loadModule().then(function (m) {
+      var init = (m && (m.init || (m.default && m.default.init))) || (window.Waline && window.Waline.init);
+      if (typeof init !== 'function') throw new Error('waline init not found');
+      // 重新取一次元素：PJAX 可能已经替换过 DOM
+      var mountEl = document.getElementById('waline');
+      if (!mountEl) {
+        el.dataset.wlMounting = '';
+        return;
+      }
+      mountEl.innerHTML = '';
+      init(window.__walineCfg);
+      // 关键：初始化成功之后再标记已挂载（修复“刷新后不显示”）
+      mountEl.dataset.wlMounted = '1';
+      mountEl.dataset.wlMounting = '';
+      bootAttempts = 0;
+    }).catch(function (e) {
+      // 失败不要留下“已挂载”的错误状态，清空缓存以便下次重试
+      window.__walineModulePromise = null;
+      var mountEl = document.getElementById('waline');
+      if (mountEl) mountEl.dataset.wlMounting = '';
+      console.error('[waline] load failed', e);
+    });
+  };
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', function () { window.__walineBoot(); });
+  } else {
+    window.__walineBoot();
+  }
+})();
+</script>
+{{- end -}}
+
+{{- /* 3. 初始化 pjax */ -}}
+<script>
+(function () {
+  // 若 pjax 库未加载成功，直接退出，页面按普通整页跳转工作，不会报错
+  if (typeof Pjax === "undefined") {
+    console.warn("[pjax] 库未加载，已跳过无刷新初始化");
+    return;
+  }
+
+  var pjax = new Pjax({
+    selectors: [".main-container"],
+    // 服务器响应超过该毫秒数才退化为整页刷新；给大值可避免慢响应时误触发整页刷新
+    timeout: 15000
+  });
+
+  // 暴露到全局：search.tsx 里会调用 pjax.refresh(document) 重新绑定
+  // 动态渲染出来的搜索结果链接，否则这些新 <a> 不会被 pjax 接管
+  window.pjax = pjax;
+
+  // 保存库的原始响应处理逻辑
+  var rawHandleResponse = pjax.handleResponse.bind(pjax);
+
+  // 覆写：先同步 <body> 的 class，再交回原始逻辑
+  pjax.handleResponse = function (responseText, request, href, options) {
+    try {
+      var newDom = new DOMParser().parseFromString(responseText, "text/html");
+      if (newDom && newDom.body) {
+        if (newDom.body.className) {
+          document.body.setAttribute("class", newDom.body.className);
+        }
+        window.__pjaxHasComments = !!newDom.body.querySelector('script[src="https://giscus.app/client.js"]');
+      }
+    } catch (e) {
+      console.warn("[pjax] 同步 body class 失败", e);
+    }
+    // 无论整页 HTML 还是局部 HTML，都交给库处理（原先这里是空分支，会卡住不刷新）
+    return rawHandleResponse(responseText, request, href, options);
+  };
+
+  // 修改进度条颜色
+  if (window.topbar && typeof topbar.config === "function") {
+    topbar.config({
+      barColors: {
+        "0": "rgba(255,  255, 255, 1)", // 进度0%白色
+        "1.0": "rgba(0, 149, 234,  1)" // 进度100%蓝色
+      }
+    });
+  }
+
+  document.addEventListener("pjax:send", function () {
+    if (window.topbar && typeof topbar.show === "function") topbar.show();
+  });
+
+  document.addEventListener("pjax:complete", function () {
+    if (window.Stack && typeof Stack.init === "function") Stack.init();
+    if (window.topbar && typeof topbar.hide === "function") topbar.hide();
+
+    // PJAX 切换后 .main-container 被替换，重新初始化返回顶部按钮与文章目录
+    if (typeof initScrollTop === "function") initScrollTop();
+    if (typeof initTocHide === "function") initTocHide();
+
+    // PJAX 切换后重新挂载 Waline（.main-container 被替换，脚本不会自动重跑）
+    if (window.__walineBoot) window.__walineBoot();
+
+    var cfg = window.__giscusConfig;
+    if (!cfg || !window.__pjaxHasComments) return;
+    var main = document.querySelector(".main-container main") || document.querySelector("main");
+    if (!main) return;
+    main.querySelectorAll(".giscus").forEach(function (el) { el.remove(); });
+    var oldScript = main.querySelector('script[src="https://giscus.app/client.js"]');
+    var script = document.createElement("script");
+    script.src = "https://giscus.app/client.js";
+    script.setAttribute("data-repo", cfg.repo);
+    script.setAttribute("data-repo-id", cfg.repoId);
+    script.setAttribute("data-category", cfg.category);
+    script.setAttribute("data-category-id", cfg.categoryId);
+    script.setAttribute("data-mapping", cfg.mapping);
+    script.setAttribute("data-strict", cfg.strict);
+    script.setAttribute("data-reactions-enabled", cfg.reactionsEnabled);
+    script.setAttribute("data-emit-metadata", cfg.emitMetadata);
+    script.setAttribute("data-input-position", cfg.inputPosition);
+    script.setAttribute("data-theme", document.documentElement.dataset.scheme === "dark" ? cfg.darkTheme : cfg.lightTheme);
+    script.setAttribute("data-lang", cfg.lang);
+    script.setAttribute("crossorigin", "anonymous");
+    script.async = true;
+    if (oldScript) {
+      oldScript.parentNode.insertBefore(script, oldScript);
+      oldScript.parentNode.removeChild(oldScript);
+    } else {
+      var anchor = main.querySelector(".site-footer");
+      if (anchor) {
+        main.insertBefore(script, anchor);
+      } else {
+        main.appendChild(script);
+      }
+    }
+  });
+})();
+</script>

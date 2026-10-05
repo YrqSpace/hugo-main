@@ -1,22 +1,360 @@
 <!DOCTYPE html>
 <html lang="zh-cn" dir="ltr">
-    <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset='utf-8'>
+    <head><meta charset='utf-8'>
 <meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="演示说明">
 <title>Posts</title>
 
-<link rel='canonical' href='http://localhost:1313/post/'>
+<link rel='canonical' href='https://yrqspace.github.io/post/'>
 
-<link rel="stylesheet" href="/scss/style.min.0304c6baf04e01a8fe70693791cb744d56a3578a3120a8796cefc66825aa39c7.css"><meta property='og:title' content="Posts">
+<link rel="stylesheet" href="/scss/style.min.e00a6c1cd8a8cd0514f99170a36de1c2a593fd15dd3c4f69f261fe2328457061.css"><meta property='og:title' content="Posts">
 <meta property='og:description' content="演示说明">
-<meta property='og:url' content='http://localhost:1313/post/'>
+<meta property='og:url' content='https://yrqspace.github.io/post/'>
 <meta property='og:site_name' content='爱玩win11的me'>
-<meta property='og:type' content='website'><meta property='og:updated_time' content=' 2020-09-09T00:00:00&#43;00:00 '/>
+<meta property='og:type' content='website'><meta property='og:updated_time' content=' 2026-10-02T00:00:00&#43;00:00 '/>
 <meta name="twitter:title" content="Posts">
-<meta name="twitter:description" content="演示说明"><link rel="alternate" type="application/rss&#43;xml" href="http://localhost:1313/post/index.xml">
+<meta name="twitter:description" content="演示说明"><link rel="alternate" type="application/rss&#43;xml" href="https://yrqspace.github.io/post/index.xml">
     <link rel="shortcut icon" href="/favicon.ico" />
 
   
 
+
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" async defer></script>
+<script>
+    (function () {
+        
+        var KEY = 'turnstile-passed';
+        var passed = false;
+        try { passed = sessionStorage.getItem(KEY) === '1'; } catch (e) { passed = false; }
+        
+        window.__turnstilePassed = passed;
+        if (passed) {
+            
+            document.documentElement.classList.add('turnstile-passed');
+        } else {
+            document.documentElement.classList.add('is-loading');
+        }
+    })();
+</script>
+<div class="loading">
+    <div class="spinner">
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+    </div>
+    <div class="captcha-prepare" id="captchaPrepare">正在准备人机验证...</div>
+    <div class="captcha-box" id="captchaBox"></div>
+    <div class="captcha-after" id="captchaAfter">请稍后,正在请求blog-turnstile接口</div>
+</div>
+
+<style>
+    .loading {
+        position: fixed;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 99;
+         
+        background-color: var(--body-background, #f5f5fa);
+         
+        transition: opacity 0.1s ease;
+    }
+
+     
+    .loading.is-hidden {
+        opacity: 0;
+        pointer-events: none;
+    }
+
+     
+    html.turnstile-passed .loading {
+        display: none !important;
+    }
+
+     
+    html[data-scheme="light"] .loading {
+        background-color: #f5f5fa;
+    }
+    html[data-scheme="dark"] .loading {
+        background-color: #303030;
+    }
+    @media (prefers-color-scheme: dark) {
+        .loading {
+            background-color: #303030;
+        }
+    }
+
+     
+    html.is-loading .aplayer {
+        opacity: 0 !important;
+        visibility: hidden !important;
+        pointer-events: none !important;
+    }
+     
+    .aplayer {
+        transition: opacity 0.4s ease;
+    }
+
+    .spinner {
+        --gap: 5px;
+        --clr: #3b82f6;    
+        --height: 23px;
+        width: 100px;
+        height: 100px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: var(--gap);
+        transition: opacity 0.35s ease;
+    }
+     
+    .spinner.is-hidden {
+        opacity: 0;
+    }
+
+    .spinner span {
+        background: var(--clr);
+        width: 6px;
+        height: var(--height);
+        animation: grow 1s ease-in-out infinite;
+    }
+    .spinner span:nth-child(2) { animation: grow 1s ease-in-out 0.15s infinite; }
+    .spinner span:nth-child(3) { animation: grow 1s ease-in-out 0.3s infinite; }
+    .spinner span:nth-child(4) { animation: grow 1s ease-in-out 0.475s infinite; }
+
+    @keyframes grow {
+        0%, 100% { transform: scaleY(1); }
+        50% { transform: scaleY(1.8); }
+    }
+
+     
+    .captcha-prepare {
+        display: none;
+        margin-top: 6px;
+        font-size: 14px;
+        letter-spacing: 1px;
+        color: var(--body-text-color, #555);
+    }
+    .captcha-prepare.is-show {
+        display: block;
+        animation: captchaSlideIn 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+    }
+
+     
+    .captcha-box {
+        display: none;
+        margin-top: 6px;
+        min-height: 65px;
+    }
+    .captcha-box.is-show {
+        display: block;
+        animation: captchaSlideIn 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+    }
+
+     
+    .captcha-after {
+        display: none;
+        margin-top: 6px;
+        font-size: 14px;
+        letter-spacing: 1px;
+        color: var(--body-text-color, #555);
+    }
+    .captcha-after.is-show {
+        display: block;
+        animation: captchaSlideIn 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+    }
+
+     
+    @keyframes captchaSlideIn {
+        from { opacity: 0; transform: translateX(60px); }
+        to { opacity: 1; transform: translateX(0); }
+    }
+</style>
+
+<script>
+    function initLoading() {
+        var loading = document.querySelector(".loading");
+        var hidden = false;
+        var captchaStarted = false;
+
+        
+        if (window.__turnstilePassed) {
+            if (loading) {
+                loading.style.display = "none";
+            }
+            document.documentElement.classList.remove("is-loading");
+            return;
+        }
+
+        
+        function hideLoading() {
+            if (!loading || hidden) {
+                return;
+            }
+            hidden = true;
+            
+            loading.classList.add("is-hidden");
+            
+            setTimeout(function () {
+                loading.style.display = "none";
+                
+                document.documentElement.classList.remove("is-loading");
+            }, 500);
+        }
+
+        
+        
+        function startCaptcha() {
+            if (captchaStarted) {
+                return;
+            }
+            captchaStarted = true;
+
+            var spinner = document.querySelector(".loading .spinner");
+            var prepare = document.getElementById("captchaPrepare");
+            var box = document.getElementById("captchaBox");
+
+            
+            if (spinner) {
+                spinner.classList.add("is-hidden");
+            }
+            
+            if (prepare) {
+                prepare.classList.add("is-show");
+            }
+
+            
+            setTimeout(function () {
+                if (prepare) {
+                    prepare.classList.remove("is-show");
+                }
+                if (box) {
+                    box.classList.add("is-show");
+                }
+                renderTurnstile(box);
+            }, 500);
+        }
+
+        
+        function renderTurnstile(box) {
+            if (!box) {
+                return;
+            }
+            var waited = 0;
+            var timer = setInterval(function () {
+                if (window.turnstile && typeof window.turnstile.render === "function") {
+                    clearInterval(timer);
+                    doRender(box);
+                } else if (waited >= 8000) {
+                    clearInterval(timer);
+                    box.innerHTML = '<p style="margin:0 0 12px;font-size:13px;text-align:center;">验证组件加载失败，请检查网络后重试</p>';
+                    var btn = document.createElement("button");
+                    btn.textContent = "重新加载";
+                    btn.style.cssText = "display:block;margin:0 auto;padding:8px 18px;border:0;border-radius:8px;background:var(--accent-color,#3b82f6);color:#fff;cursor:pointer;";
+                    btn.onclick = function () {
+                        location.reload();
+                    };
+                    box.appendChild(btn);
+                }
+                waited += 200;
+            }, 200);
+        }
+
+        function doRender(box) {
+            var scheme = document.documentElement.getAttribute("data-scheme");
+            var theme = scheme === "dark" ? "dark" : (scheme === "light" ? "light" : "auto");
+            try {
+                window.turnstile.render(box, {
+                    sitekey: "0x4AAAAAAFMoHgJeuUgOvCLv",
+                    theme: theme,
+                    callback: function () {
+                        
+                        try { sessionStorage.setItem("turnstile-passed", "1"); } catch (e) {}
+                        
+                        var prepare = document.getElementById("captchaPrepare");
+                        var after = document.getElementById("captchaAfter");
+                        if (box) { box.classList.remove("is-show"); }
+                        if (prepare) { prepare.classList.remove("is-show"); }
+                        if (after) { after.classList.add("is-show"); }
+                        setTimeout(hideLoading, 800);
+                    }
+                });
+            } catch (e) {
+                box.innerHTML = '<p style="margin:0;font-size:13px;text-align:center;">验证初始化失败，请刷新页面重试</p>';
+            }
+        }
+
+        
+        function whenImageReady(img, callback) {
+            if (!img) {
+                callback();
+                return;
+            }
+            
+            try { img.loading = "eager"; } catch (e) {}
+            if (img.complete && img.naturalWidth !== 0) {
+                callback();
+                return;
+            }
+            img.addEventListener("load", callback, { once: true });
+            img.addEventListener("error", callback, { once: true });
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            
+            var avatar = document.querySelector(".site-avatar img, img.site-logo");
+
+            
+            var articles = document.querySelectorAll(".article-list > article, .article-list .article-item");
+            var total = articles.length;
+            var need = Math.ceil(total / 2);
+
+            var avatarDone = false;
+            var articleDone = 0;
+            var startScheduled = false;
+
+            function maybeStart() {
+                if (avatarDone && articleDone >= need && !startScheduled) {
+                    startScheduled = true;
+                    
+                    setTimeout(startCaptcha, 1000);
+                }
+            }
+
+            
+            whenImageReady(avatar, function () {
+                avatarDone = true;
+                maybeStart();
+            });
+
+            if (need === 0) {
+                maybeStart();
+            } else {
+                var counted = 0;
+                Array.prototype.forEach.call(articles, function (article) {
+                    if (counted >= need) {
+                        return;
+                    }
+                    counted++;
+                    whenImageReady(article.querySelector("img"), function () {
+                        articleDone++;
+                        maybeStart();
+                    });
+                });
+            }
+
+            
+            setTimeout(startCaptcha, 15000);
+        });
+    }
+
+    initLoading();
+</script>
 
     </head>
     <body class="">
@@ -93,7 +431,7 @@
             
                 <li>
                     <a 
-                        href='https://github.com/CaiJimmy/hugo-theme-stack'
+                        href='https://github.com/YrqSpace'
                         target="_blank"
                         title="GitHub"
                         rel="me"
@@ -243,6 +581,1279 @@
     <aside class="sidebar right-sidebar sticky">
         
             
+                <div style="width: 100%; text-align: center;">
+  <div class='clock-wrapper'>
+    <div class='clock-border'>
+      <div class='clock'>
+        <ul class='minute-marks'>
+          <li class='five'></li>
+          <li></li>
+          <li></li>
+          <li></li>
+          <li></li>
+          <li class='five'></li>
+          <li></li>
+          <li></li>
+          <li></li>
+          <li></li>
+          <li class='five'></li>
+          <li></li>
+          <li></li>
+          <li></li>
+          <li></li>
+          <li class='five'></li>
+          <li></li>
+          <li></li>
+          <li></li>
+          <li></li>
+          <li class='five'></li>
+          <li></li>
+          <li></li>
+          <li></li>
+          <li></li>
+          <li class='five'></li>
+          <li></li>
+          <li></li>
+          <li></li>
+          <li></li>
+        </ul>
+        <div class='hour'>
+          <div class='hand'></div>
+        </div>
+        <div class='minute'>
+          <div class='hand'></div>
+        </div>
+        <div class='second'>
+          <div class='hand'></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  
+  (function startClockWhenLoaded() {
+    function boot() { initTime(); }
+    if (!document.documentElement.classList.contains("is-loading")) { boot(); return; }
+    var obs = new MutationObserver(function () {
+      if (!document.documentElement.classList.contains("is-loading")) {
+        obs.disconnect();
+        boot();
+      }
+    });
+    obs.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
+  })();
+
+  
+
+  function initTime() {
+    
+    const now = new Date();
+    const perHour = 360 / 12;
+    const perHourMinute = perHour / 60;
+    const perSecond = 360 / 60;
+    
+    const hour = document.querySelector(".hour");
+    setDeg(hour, (now.getHours() % 12) * perHour + now.getMinutes() * perHourMinute);
+    
+    const minute = document.querySelector(".minute");
+    setDeg(minute, now.getMinutes() * perSecond + now.getSeconds() * perSecond / 60);
+    
+    const second = document.querySelector(".second");
+    setDeg(second, now.getSeconds() * perSecond);
+  }
+
+  
+
+  function setDeg(element, deg) {
+    element.style.transform = "rotate(" + deg + "deg)";
+  }
+</script>
+
+<style>
+ 
+html.is-loading .clock-wrapper,
+html.is-loading .clock-wrapper * {
+  animation-play-state: paused !important;
+}
+.clock-wrapper {
+ 
+  overflow: hidden;
+  position: relative;
+  width: 460px;
+  height: 460px;
+  zoom: 0.4;
+  display: inline-block;
+}
+.clock-border {
+  position: absolute;
+ 
+  margin: auto;
+  width: 460px;
+  height: 460px;
+  border-width: 18px;
+  border-color: transparent #d2d8df #d2d8df;
+  border-style: solid;
+  -webkit-border-radius: 50%;
+  -webkit-background-clip: padding-box;
+  -moz-border-radius: 50%;
+  -moz-background-clip: padding;
+  border-radius: 50%;
+  background-clip: padding-box;
+  -webkit-transform: rotate(45deg);
+  -moz-transform: rotate(45deg);
+  -o-transform: rotate(45deg);
+  -ms-transform: rotate(45deg);
+  transform: rotate(45deg);
+  -webkit-animation: rotate-clock-border 0.69s cubic-bezier(0.645, 0, 0.605, 1) 0.69s 1 forwards;
+  -moz-animation: rotate-clock-border 0.69s cubic-bezier(0.645, 0, 0.605, 1) 0.69s 1 forwards;
+  -o-animation: rotate-clock-border 0.69s cubic-bezier(0.645, 0, 0.605, 1) 0.69s 1 forwards;
+  animation: rotate-clock-border 0.69s cubic-bezier(0.645, 0, 0.605, 1) 0.69s 1 forwards;
+  -webkit-animation-timing-function: cubic-bezier(0.645, -0.18, 0.605, 1.36);
+  -moz-animation-timing-function: cubic-bezier(0.645, -0.18, 0.605, 1.36);
+  -o-animation-timing-function: cubic-bezier(0.645, -0.18, 0.605, 1.36);
+  animation-timing-function: cubic-bezier(0.645, -0.18, 0.605, 1.36);
+}
+.clock {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  margin: auto;
+  width: 400px;
+  height: 400px;
+  padding: 0;
+  background-color: #262c33;
+  border: 18px solid #373f4a;
+  -webkit-border-radius: 50%;
+  -webkit-background-clip: padding-box;
+  -moz-border-radius: 50%;
+  -moz-background-clip: padding;
+  border-radius: 50%;
+  background-clip: padding-box;
+  -webkit-background-clip: border-box;
+  -moz-background-clip: border;
+  background-clip: border-box;
+  -webkit-transform: rotate(-45deg);
+  -moz-transform: rotate(-45deg);
+  -o-transform: rotate(-45deg);
+  -ms-transform: rotate(-45deg);
+  transform: rotate(-45deg);
+  -webkit-animation: counterrotate-clock 0.69s cubic-bezier(0.645, 0, 0.605, 1) 0.69s 1 forwards;
+  -moz-animation: counterrotate-clock 0.69s cubic-bezier(0.645, 0, 0.605, 1) 0.69s 1 forwards;
+  -o-animation: counterrotate-clock 0.69s cubic-bezier(0.645, 0, 0.605, 1) 0.69s 1 forwards;
+  animation: counterrotate-clock 0.69s cubic-bezier(0.645, 0, 0.605, 1) 0.69s 1 forwards;
+  -webkit-animation-timing-function: cubic-bezier(0.645, -0.18, 0.605, 1.36);
+  -moz-animation-timing-function: cubic-bezier(0.645, -0.18, 0.605, 1.36);
+  -o-animation-timing-function: cubic-bezier(0.645, -0.18, 0.605, 1.36);
+  animation-timing-function: cubic-bezier(0.645, -0.18, 0.605, 1.36);
+}
+
+@-webkit-keyframes rotate-clock-border{
+  0%{ -webkit-transform: rotate( 45deg); }
+  100%{ -webkit-transform: rotate( 315deg); }
+}
+@-moz-keyframes rotate-clock-border{
+  0%{ -moz-transform: rotate( 45deg); }
+  100%{ -moz-transform: rotate( 315deg); }
+}
+@-o-keyframes rotate-clock-border{
+  0%{ -o-transform: rotate( 45deg); }
+  100%{ -o-transform: rotate( 315deg); }
+}
+@keyframes rotate-clock-border{
+  0%{-webkit-transform: rotate( 45deg);-moz-transform: rotate( 45deg);-ms-transform: rotate( 45deg);transform: rotate( 45deg); }
+  100%{-webkit-transform: rotate( 315deg);-moz-transform: rotate( 315deg);-ms-transform: rotate( 315deg);transform: rotate( 315deg); }
+}
+
+@-webkit-keyframes counterrotate-clock{
+  0%{ -webkit-transform: rotate(-45deg); }
+  100%{ -webkit-transform: rotate(-315deg); }
+}
+@-moz-keyframes counterrotate-clock{
+  0%{ -moz-transform: rotate(-45deg); }
+  100%{ -moz-transform: rotate(-315deg); }
+}
+@-o-keyframes counterrotate-clock{
+  0%{ -o-transform: rotate(-45deg); }
+  100%{ -o-transform: rotate(-315deg); }
+}
+@keyframes counterrotate-clock{
+  0%{-webkit-transform: rotate(-45deg);-moz-transform: rotate(-45deg);-ms-transform: rotate(-45deg);transform: rotate(-45deg); }
+  100%{-webkit-transform: rotate(-315deg);-moz-transform: rotate(-315deg);-ms-transform: rotate(-315deg);transform: rotate(-315deg); }
+}
+
+.hour {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  margin: auto;
+  -webkit-transform: rotate(5deg);
+  -moz-transform: rotate(5deg);
+  -o-transform: rotate(5deg);
+  -ms-transform: rotate(5deg);
+  transform: rotate(5deg);
+}
+.hour .hand {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  margin: auto;
+  -webkit-animation: tick 43200s normal infinite steps(3600, end) 3s;
+  -moz-animation: tick 43200s normal infinite steps(3600, end) 3s;
+  -o-animation: tick 43200s normal infinite steps(3600, end) 3s;
+  animation: tick 43200s normal infinite steps(3600, end) 3s;
+}
+.hour .hand:before {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  margin: auto;
+  display: inline-block;
+  top: 0;
+  width: 16px;
+  height: 0;
+  -webkit-border-top-left-radius: 2px;
+  -moz-border-radius-topleft: 2px;
+  border-top-left-radius: 2px;
+  -webkit-border-top-right-radius: 2px;
+  -webkit-background-clip: padding-box;
+  -moz-border-radius-topright: 2px;
+  -moz-background-clip: padding;
+  border-top-right-radius: 2px;
+  background-clip: padding-box;
+  -webkit-transform-origin: center 100%;
+  -moz-transform-origin: center 100%;
+  -o-transform-origin: center 100%;
+  -ms-transform-origin: center 100%;
+  transform-origin: center 100%;
+  background-color: #fff;
+}
+.hour .hand:after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  margin: auto;
+  top: 0;
+  display: inline-block;
+  border-bottom: 16px solid #ffffff;
+  border-left: 8px solid transparent;
+  border-right: 8px solid transparent;
+  width: 0;
+  height: 0;
+  -webkit-transform-origin: center 100%;
+  -moz-transform-origin: center 100%;
+  -o-transform-origin: center 100%;
+  -ms-transform-origin: center 100%;
+  transform-origin: center 100%;
+}
+.hour .hand:before {
+  -webkit-animation: hour-grow-before 0.4s cubic-bezier(0.69, 0, 0.49, 1) 1.35s 1 forwards;
+  -moz-animation: hour-grow-before 0.4s cubic-bezier(0.69, 0, 0.49, 1) 1.35s 1 forwards;
+  -o-animation: hour-grow-before 0.4s cubic-bezier(0.69, 0, 0.49, 1) 1.35s 1 forwards;
+  animation: hour-grow-before 0.4s cubic-bezier(0.69, 0, 0.49, 1) 1.35s 1 forwards;
+  -webkit-animation-timing-function: cubic-bezier(0.69, -0.06, 0.49, 1.4);
+  -moz-animation-timing-function: cubic-bezier(0.69, -0.06, 0.49, 1.4);
+  -o-animation-timing-function: cubic-bezier(0.69, -0.06, 0.49, 1.4);
+  animation-timing-function: cubic-bezier(0.69, -0.06, 0.49, 1.4);
+}
+
+@-webkit-keyframes hour-grow-before{
+  0%{ height: 0; top: 0; }
+  100%{ height: 120px; top: -120px; }
+}
+@-moz-keyframes hour-grow-before{
+  0%{ height: 0; top: 0; }
+  100%{ height: 120px; top: -120px; }
+}
+@-o-keyframes hour-grow-before{
+  0%{ height: 0; top: 0; }
+  100%{ height: 120px; top: -120px; }
+}
+@keyframes hour-grow-before{
+  0%{ height: 0; top: 0; }
+  100%{ height: 120px; top: -120px; }
+}
+.hour .hand:after {
+  -webkit-animation: hour-grow-after 0.4s cubic-bezier(0.69, 0, 0.49, 1) 1.35s 1 forwards;
+  -moz-animation: hour-grow-after 0.4s cubic-bezier(0.69, 0, 0.49, 1) 1.35s 1 forwards;
+  -o-animation: hour-grow-after 0.4s cubic-bezier(0.69, 0, 0.49, 1) 1.35s 1 forwards;
+  animation: hour-grow-after 0.4s cubic-bezier(0.69, 0, 0.49, 1) 1.35s 1 forwards;
+  -webkit-animation-timing-function: cubic-bezier(0.69, -0.06, 0.49, 1.4);
+  -moz-animation-timing-function: cubic-bezier(0.69, -0.06, 0.49, 1.4);
+  -o-animation-timing-function: cubic-bezier(0.69, -0.06, 0.49, 1.4);
+  animation-timing-function: cubic-bezier(0.69, -0.06, 0.49, 1.4);
+}
+
+@-webkit-keyframes hour-grow-after{
+  0%{ top: 0; }
+  100%{ top: -254px; }
+}
+@-moz-keyframes hour-grow-after{
+  0%{ top: 0; }
+  100%{ top: -254px; }
+}
+@-o-keyframes hour-grow-after{
+  0%{ top: 0; }
+  100%{ top: -254px; }
+}
+@keyframes hour-grow-after{
+  0%{ top: 0; }
+  100%{ top: -254px; }
+}
+.minute {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  margin: auto;
+  -webkit-transform: rotate(288deg);
+  -moz-transform: rotate(288deg);
+  -o-transform: rotate(288deg);
+  -ms-transform: rotate(288deg);
+  transform: rotate(288deg);
+}
+.minute .hand {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  margin: auto;
+  -webkit-animation: tick 3600s normal infinite steps(3600, end) 3s;
+  -moz-animation: tick 3600s normal infinite steps(3600, end) 3s;
+  -o-animation: tick 3600s normal infinite steps(3600, end) 3s;
+  animation: tick 3600s normal infinite steps(3600, end) 3s;
+}
+.minute .hand:before {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  margin: auto;
+  display: inline-block;
+  top: 0;
+  width: 12px;
+  height: 0;
+  -webkit-border-top-left-radius: 2px;
+  -moz-border-radius-topleft: 2px;
+  border-top-left-radius: 2px;
+  -webkit-border-top-right-radius: 2px;
+  -webkit-background-clip: padding-box;
+  -moz-border-radius-topright: 2px;
+  -moz-background-clip: padding;
+  border-top-right-radius: 2px;
+  background-clip: padding-box;
+  -webkit-transform-origin: center 100%;
+  -moz-transform-origin: center 100%;
+  -o-transform-origin: center 100%;
+  -ms-transform-origin: center 100%;
+  transform-origin: center 100%;
+  background-color: #fff;
+}
+.minute .hand:after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  margin: auto;
+  top: 0;
+  display: inline-block;
+  border-bottom: 12px solid #ffffff;
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  width: 0;
+  height: 0;
+  -webkit-transform-origin: center 100%;
+  -moz-transform-origin: center 100%;
+  -o-transform-origin: center 100%;
+  -ms-transform-origin: center 100%;
+  transform-origin: center 100%;
+}
+.minute .hand:before {
+  -webkit-animation: minute-grow-before 0.4s cubic-bezier(0.69, 0, 0.49, 1) 1.6s 1 forwards;
+  -moz-animation: minute-grow-before 0.4s cubic-bezier(0.69, 0, 0.49, 1) 1.6s 1 forwards;
+  -o-animation: minute-grow-before 0.4s cubic-bezier(0.69, 0, 0.49, 1) 1.6s 1 forwards;
+  animation: minute-grow-before 0.4s cubic-bezier(0.69, 0, 0.49, 1) 1.6s 1 forwards;
+  -webkit-animation-timing-function: cubic-bezier(0.69, -0.06, 0.49, 1.4);
+  -moz-animation-timing-function: cubic-bezier(0.69, -0.06, 0.49, 1.4);
+  -o-animation-timing-function: cubic-bezier(0.69, -0.06, 0.49, 1.4);
+  animation-timing-function: cubic-bezier(0.69, -0.06, 0.49, 1.4);
+}
+ 
+ 
+ 
+@-webkit-keyframes minute-grow-before{
+  0%{ height: 0; top: 0; }
+  100%{ height: 168px; top: -168px; }
+}
+@-moz-keyframes minute-grow-before{
+  0%{ height: 0; top: 0; }
+  100%{ height: 168px; top: -168px; }
+}
+@-o-keyframes minute-grow-before{
+  0%{ height: 0; top: 0; }
+  100%{ height: 168px; top: -168px; }
+}
+@keyframes minute-grow-before{
+  0%{ height: 0; top: 0; }
+  100%{ height: 168px; top: -168px; }
+}
+.minute .hand:after {
+  -webkit-animation: minute-grow-after 0.4s cubic-bezier(0.69, 0, 0.49, 1) 1.6s 1 forwards;
+  -moz-animation: minute-grow-after 0.4s cubic-bezier(0.69, 0, 0.49, 1) 1.6s 1 forwards;
+  -o-animation: minute-grow-after 0.4s cubic-bezier(0.69, 0, 0.49, 1) 1.6s 1 forwards;
+  animation: minute-grow-after 0.4s cubic-bezier(0.69, 0, 0.49, 1) 1.6s 1 forwards;
+  -webkit-animation-timing-function: cubic-bezier(0.69, -0.06, 0.49, 1.4);
+  -moz-animation-timing-function: cubic-bezier(0.69, -0.06, 0.49, 1.4);
+  -o-animation-timing-function: cubic-bezier(0.69, -0.06, 0.49, 1.4);
+  animation-timing-function: cubic-bezier(0.69, -0.06, 0.49, 1.4);
+}
+
+@-webkit-keyframes minute-grow-after{
+  0%{ top: 0; }
+  100%{ top: -346px; }
+}
+@-moz-keyframes minute-grow-after{
+  0%{ top: 0; }
+  100%{ top: -346px; }
+}
+@-o-keyframes minute-grow-after{
+  0%{ top: 0; }
+  100%{ top: -346px; }
+}
+@keyframes minute-grow-after{
+  0%{ top: 0; }
+  100%{ top: -346px; }
+}
+.second {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  margin: auto;
+  -webkit-transform: rotate(0);
+  -moz-transform: rotate(0);
+  -o-transform: rotate(0);
+  -ms-transform: rotate(0);
+  transform: rotate(0);
+}
+.second .hand {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  margin: auto;
+  -webkit-animation: tick-second 1s normal infinite steps(30, end) 3s;
+  -moz-animation: tick-second 1s normal infinite steps(30, end) 3s;
+  -o-animation: tick-second 1s normal infinite steps(30, end) 3s;
+  animation: tick-second 1s normal infinite steps(30, end) 3s;
+}
+.second .hand:before {
+  content: '';
+  display: inline-block;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  margin: auto;
+  top: 0;
+  width: 8px;
+  height: 0;
+  background-color: #f16b41;
+  -webkit-border-radius: 8px;
+  -webkit-background-clip: padding-box;
+  -moz-border-radius: 8px;
+  -moz-background-clip: padding;
+  border-radius: 8px;
+  background-clip: padding-box;
+  -webkit-transform-origin: center 180px;
+  -moz-transform-origin: center 180px;
+  -o-transform-origin: center 180px;
+  -ms-transform-origin: center 180px;
+  transform-origin: center 180px;
+  -webkit-animation: second-grow 1.6s cubic-bezier(1, 0, 0, 1) 1.45s 1 forwards, second 60s normal infinite steps(60, end) 3s;
+  -moz-animation: second-grow 1.6s cubic-bezier(1, 0, 0, 1) 1.45s 1 forwards, second 60s normal infinite steps(60, end) 3s;
+  -o-animation: second-grow 1.6s cubic-bezier(1, 0, 0, 1) 1.45s 1 forwards, second 60s normal infinite steps(60, end) 3s;
+  animation: second-grow 1.6s cubic-bezier(1, 0, 0, 1) 1.45s 1 forwards, second 60s normal infinite steps(60, end) 3s;
+}
+
+@-webkit-keyframes second-grow{
+  from { top: 0; height: 0; }
+  100%{ top: -120px; height: 240px; }
+}
+@-moz-keyframes second-grow{
+  from { top: 0; height: 0; }
+  100%{ top: -120px; height: 240px; }
+}
+@-o-keyframes second-grow{
+  from { top: 0; height: 0; }
+  100%{ top: -120px; height: 240px; }
+}
+@keyframes second-grow{
+  from { top: 0; height: 0; }
+  100%{ top: -120px; height: 240px; }
+}
+.second .hand:after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  margin: auto;
+  display: inline-block;
+  width: 32px;
+  height: 32px;
+  -webkit-border-radius: 32px;
+  -webkit-background-clip: padding-box;
+  -moz-border-radius: 32px;
+  -moz-background-clip: padding;
+  border-radius: 32px;
+  background-clip: padding-box;
+  background-color: #f16b41;
+}
+
+@-webkit-keyframes tick{
+  0%{ -webkit-transform: rotate(0deg); }
+  100%{ -webkit-transform: rotate(360deg); }
+}
+@-moz-keyframes tick{
+  0%{ -moz-transform: rotate(0deg); }
+  100%{ -moz-transform: rotate(360deg); }
+}
+@-o-keyframes tick{
+  0%{ -o-transform: rotate(0deg); }
+  100%{ -o-transform: rotate(360deg); }
+}
+@keyframes tick{
+  0%{-webkit-transform: rotate(0deg);-moz-transform: rotate(0deg);-ms-transform: rotate(0deg);transform: rotate(0deg); }
+  100%{-webkit-transform: rotate(360deg);-moz-transform: rotate(360deg);-ms-transform: rotate(360deg);transform: rotate(360deg); }
+}
+
+@-webkit-keyframes second{
+  0%{ -webkit-transform: rotate(0deg) }
+  100%{ -webkit-transform: rotate(360deg) }
+}
+@-moz-keyframes second{
+  0%{ -moz-transform: rotate(0deg) }
+  100%{ -moz-transform: rotate(360deg) }
+}
+@-o-keyframes second{
+  0%{ -o-transform: rotate(0deg) }
+  100%{ -o-transform: rotate(360deg) }
+}
+@keyframes second{
+  0%{-webkit-transform: rotate(0deg);-moz-transform: rotate(0deg);-ms-transform: rotate(0deg);transform: rotate(0deg);}
+  100%{-webkit-transform: rotate(360deg);-moz-transform: rotate(360deg);-ms-transform: rotate(360deg);transform: rotate(360deg);}
+}
+
+@-webkit-keyframes tick-second{
+  0%{ -webkit-transform: rotate(0deg); }
+  21%{ -webkit-transform: rotate(4deg); }
+  26%{ -webkit-transform: rotate(8deg); }
+  33%{ -webkit-transform: rotate(4deg); }
+  37%{ -webkit-transform: rotate(6deg); }
+  100%{ -webkit-transform: rotate(6deg); }
+}
+@-moz-keyframes tick-second{
+  0%{ -moz-transform: rotate(0deg); }
+  21%{ -moz-transform: rotate(4deg); }
+  26%{ -moz-transform: rotate(8deg); }
+  33%{ -moz-transform: rotate(4deg); }
+  37%{ -moz-transform: rotate(6deg); }
+  100%{ -moz-transform: rotate(6deg); }
+}
+@-o-keyframes tick-second{
+  0%{ -o-transform: rotate(0deg); }
+  21%{ -o-transform: rotate(4deg); }
+  26%{ -o-transform: rotate(8deg); }
+  33%{ -o-transform: rotate(4deg); }
+  37%{ -o-transform: rotate(6deg); }
+  100%{ -o-transform: rotate(6deg); }
+}
+@keyframes tick-second{
+  0%{-webkit-transform: rotate(0deg);-moz-transform: rotate(0deg);-ms-transform: rotate(0deg);transform: rotate(0deg); }
+  21%{-webkit-transform: rotate(4deg);-moz-transform: rotate(4deg);-ms-transform: rotate(4deg);transform: rotate(4deg); }
+  26%{-webkit-transform: rotate(8deg);-moz-transform: rotate(8deg);-ms-transform: rotate(8deg);transform: rotate(8deg); }
+  33%{-webkit-transform: rotate(4deg);-moz-transform: rotate(4deg);-ms-transform: rotate(4deg);transform: rotate(4deg); }
+  37%{-webkit-transform: rotate(6deg);-moz-transform: rotate(6deg);-ms-transform: rotate(6deg);transform: rotate(6deg); }
+  100%{-webkit-transform: rotate(6deg);-moz-transform: rotate(6deg);-ms-transform: rotate(6deg);transform: rotate(6deg); }
+}
+.minute-marks {
+  display: inline-block;
+  padding: 0;
+  margin: 0;
+  list-style-type: none;
+  width: 0;
+  height: 0;
+}
+.minute-marks li {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  margin: auto;
+  display: inline-block;
+  width: 200px;
+  height: 200px;
+}
+.minute-marks li:before,
+.minute-marks li:after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  margin: auto;
+  width: 0;
+  height: 0;
+  display: inline-block;
+  border-color: #d4d5d6;
+  border-width: 4px;
+  border-style: solid;
+  -webkit-border-radius: 4px;
+  -webkit-background-clip: padding-box;
+  -moz-border-radius: 4px;
+  -moz-background-clip: padding;
+  border-radius: 4px;
+  background-clip: padding-box;
+  -webkit-opacity: 0;
+  -moz-opacity: 0;
+  opacity: 0;
+  -webkit-animation: fade-in 0.1s ease 0s 1 forwards;
+  -moz-animation: fade-in 0.1s ease 0s 1 forwards;
+  -o-animation: fade-in 0.1s ease 0s 1 forwards;
+  animation: fade-in 0.1s ease 0s 1 forwards;
+}
+ 
+ 
+ 
+@-webkit-keyframes fade-in{
+  from{ -webkit-opacity: 0; -moz-opacity: 0; -o-opacity: 0; opacity: 0; }
+  to{ -webkit-opacity: 1; -moz-opacity: 1; -o-opacity: 1; opacity: 1; }
+}
+@-moz-keyframes fade-in{
+  from{ -webkit-opacity: 0; -moz-opacity: 0; -o-opacity: 0; opacity: 0; }
+  to{ -webkit-opacity: 1; -moz-opacity: 1; -o-opacity: 1; opacity: 1; }
+}
+@-o-keyframes fade-in{
+  from{ -webkit-opacity: 0; -moz-opacity: 0; -o-opacity: 0; opacity: 0; }
+  to{ -webkit-opacity: 1; -moz-opacity: 1; -o-opacity: 1; opacity: 1; }
+}
+@keyframes fade-in{
+  from{ -webkit-opacity: 0; -moz-opacity: 0; -o-opacity: 0; opacity: 0; }
+  to{ -webkit-opacity: 1; -moz-opacity: 1; -o-opacity: 1; opacity: 1; }
+}
+.minute-marks li:before {
+  top: -380px;
+}
+.minute-marks li:after {
+  bottom: -380px;
+}
+.minute-marks li.five:before,
+.minute-marks li.five:after {
+  width: 0;
+  height: 20px;
+}
+.minute-marks li.five:before {
+  top: -360px;
+}
+.minute-marks li.five:after {
+  bottom: -360px;
+}
+.minute-marks li:nth-child( 1) {
+  -webkit-transform: rotate(0);
+  -moz-transform: rotate(0);
+  -o-transform: rotate(0);
+  -ms-transform: rotate(0);
+  transform: rotate(0);
+}
+.minute-marks li:nth-child( 1):before {
+  -webkit-animation-delay: 0.017s;
+  -moz-animation-delay: 0.017s;
+  -o-animation-delay: 0.017s;
+  animation-delay: 0.017s;
+}
+.minute-marks li:nth-child( 1):after {
+  -webkit-animation-delay: 0.544s;
+  -moz-animation-delay: 0.544s;
+  -o-animation-delay: 0.544s;
+  animation-delay: 0.544s;
+}
+.minute-marks li:nth-child( 2) {
+  -webkit-transform: rotate(6deg);
+  -moz-transform: rotate(6deg);
+  -o-transform: rotate(6deg);
+  -ms-transform: rotate(6deg);
+  transform: rotate(6deg);
+}
+.minute-marks li:nth-child( 2):before {
+  -webkit-animation-delay: 0.034s;
+  -moz-animation-delay: 0.034s;
+  -o-animation-delay: 0.034s;
+  animation-delay: 0.034s;
+}
+.minute-marks li:nth-child( 2):after {
+  -webkit-animation-delay: 0.561s;
+  -moz-animation-delay: 0.561s;
+  -o-animation-delay: 0.561s;
+  animation-delay: 0.561s;
+}
+.minute-marks li:nth-child( 3) {
+  -webkit-transform: rotate(12deg);
+  -moz-transform: rotate(12deg);
+  -o-transform: rotate(12deg);
+  -ms-transform: rotate(12deg);
+  transform: rotate(12deg);
+}
+.minute-marks li:nth-child( 3):before {
+  -webkit-animation-delay: 0.051000000000000004s;
+  -moz-animation-delay: 0.051000000000000004s;
+  -o-animation-delay: 0.051000000000000004s;
+  animation-delay: 0.051000000000000004s;
+}
+.minute-marks li:nth-child( 3):after {
+  -webkit-animation-delay: 0.5780000000000001s;
+  -moz-animation-delay: 0.5780000000000001s;
+  -o-animation-delay: 0.5780000000000001s;
+  animation-delay: 0.5780000000000001s;
+}
+.minute-marks li:nth-child( 4) {
+  -webkit-transform: rotate(18deg);
+  -moz-transform: rotate(18deg);
+  -o-transform: rotate(18deg);
+  -ms-transform: rotate(18deg);
+  transform: rotate(18deg);
+}
+.minute-marks li:nth-child( 4):before {
+  -webkit-animation-delay: 0.068s;
+  -moz-animation-delay: 0.068s;
+  -o-animation-delay: 0.068s;
+  animation-delay: 0.068s;
+}
+.minute-marks li:nth-child( 4):after {
+  -webkit-animation-delay: 0.595s;
+  -moz-animation-delay: 0.595s;
+  -o-animation-delay: 0.595s;
+  animation-delay: 0.595s;
+}
+.minute-marks li:nth-child( 5) {
+  -webkit-transform: rotate(24deg);
+  -moz-transform: rotate(24deg);
+  -o-transform: rotate(24deg);
+  -ms-transform: rotate(24deg);
+  transform: rotate(24deg);
+}
+.minute-marks li:nth-child( 5):before {
+  -webkit-animation-delay: 0.085s;
+  -moz-animation-delay: 0.085s;
+  -o-animation-delay: 0.085s;
+  animation-delay: 0.085s;
+}
+.minute-marks li:nth-child( 5):after {
+  -webkit-animation-delay: 0.612s;
+  -moz-animation-delay: 0.612s;
+  -o-animation-delay: 0.612s;
+  animation-delay: 0.612s;
+}
+.minute-marks li:nth-child( 6) {
+  -webkit-transform: rotate(30deg);
+  -moz-transform: rotate(30deg);
+  -o-transform: rotate(30deg);
+  -ms-transform: rotate(30deg);
+  transform: rotate(30deg);
+}
+.minute-marks li:nth-child( 6):before {
+  -webkit-animation-delay: 0.10200000000000001s;
+  -moz-animation-delay: 0.10200000000000001s;
+  -o-animation-delay: 0.10200000000000001s;
+  animation-delay: 0.10200000000000001s;
+}
+.minute-marks li:nth-child( 6):after {
+  -webkit-animation-delay: 0.629s;
+  -moz-animation-delay: 0.629s;
+  -o-animation-delay: 0.629s;
+  animation-delay: 0.629s;
+}
+.minute-marks li:nth-child( 7) {
+  -webkit-transform: rotate(36deg);
+  -moz-transform: rotate(36deg);
+  -o-transform: rotate(36deg);
+  -ms-transform: rotate(36deg);
+  transform: rotate(36deg);
+}
+.minute-marks li:nth-child( 7):before {
+  -webkit-animation-delay: 0.11900000000000001s;
+  -moz-animation-delay: 0.11900000000000001s;
+  -o-animation-delay: 0.11900000000000001s;
+  animation-delay: 0.11900000000000001s;
+}
+.minute-marks li:nth-child( 7):after {
+  -webkit-animation-delay: 0.646s;
+  -moz-animation-delay: 0.646s;
+  -o-animation-delay: 0.646s;
+  animation-delay: 0.646s;
+}
+.minute-marks li:nth-child( 8) {
+  -webkit-transform: rotate(42deg);
+  -moz-transform: rotate(42deg);
+  -o-transform: rotate(42deg);
+  -ms-transform: rotate(42deg);
+  transform: rotate(42deg);
+}
+.minute-marks li:nth-child( 8):before {
+  -webkit-animation-delay: 0.136s;
+  -moz-animation-delay: 0.136s;
+  -o-animation-delay: 0.136s;
+  animation-delay: 0.136s;
+}
+.minute-marks li:nth-child( 8):after {
+  -webkit-animation-delay: 0.663s;
+  -moz-animation-delay: 0.663s;
+  -o-animation-delay: 0.663s;
+  animation-delay: 0.663s;
+}
+.minute-marks li:nth-child( 9) {
+  -webkit-transform: rotate(48deg);
+  -moz-transform: rotate(48deg);
+  -o-transform: rotate(48deg);
+  -ms-transform: rotate(48deg);
+  transform: rotate(48deg);
+}
+.minute-marks li:nth-child( 9):before {
+  -webkit-animation-delay: 0.15300000000000002s;
+  -moz-animation-delay: 0.15300000000000002s;
+  -o-animation-delay: 0.15300000000000002s;
+  animation-delay: 0.15300000000000002s;
+}
+.minute-marks li:nth-child( 9):after {
+  -webkit-animation-delay: 0.68s;
+  -moz-animation-delay: 0.68s;
+  -o-animation-delay: 0.68s;
+  animation-delay: 0.68s;
+}
+.minute-marks li:nth-child( 10) {
+  -webkit-transform: rotate(54deg);
+  -moz-transform: rotate(54deg);
+  -o-transform: rotate(54deg);
+  -ms-transform: rotate(54deg);
+  transform: rotate(54deg);
+}
+.minute-marks li:nth-child( 10):before {
+  -webkit-animation-delay: 0.17s;
+  -moz-animation-delay: 0.17s;
+  -o-animation-delay: 0.17s;
+  animation-delay: 0.17s;
+}
+.minute-marks li:nth-child( 10):after {
+  -webkit-animation-delay: 0.6970000000000001s;
+  -moz-animation-delay: 0.6970000000000001s;
+  -o-animation-delay: 0.6970000000000001s;
+  animation-delay: 0.6970000000000001s;
+}
+.minute-marks li:nth-child( 11) {
+  -webkit-transform: rotate(60deg);
+  -moz-transform: rotate(60deg);
+  -o-transform: rotate(60deg);
+  -ms-transform: rotate(60deg);
+  transform: rotate(60deg);
+}
+.minute-marks li:nth-child( 11):before {
+  -webkit-animation-delay: 0.187s;
+  -moz-animation-delay: 0.187s;
+  -o-animation-delay: 0.187s;
+  animation-delay: 0.187s;
+}
+.minute-marks li:nth-child( 11):after {
+  -webkit-animation-delay: 0.714s;
+  -moz-animation-delay: 0.714s;
+  -o-animation-delay: 0.714s;
+  animation-delay: 0.714s;
+}
+.minute-marks li:nth-child( 12) {
+  -webkit-transform: rotate(66deg);
+  -moz-transform: rotate(66deg);
+  -o-transform: rotate(66deg);
+  -ms-transform: rotate(66deg);
+  transform: rotate(66deg);
+}
+.minute-marks li:nth-child( 12):before {
+  -webkit-animation-delay: 0.20400000000000001s;
+  -moz-animation-delay: 0.20400000000000001s;
+  -o-animation-delay: 0.20400000000000001s;
+  animation-delay: 0.20400000000000001s;
+}
+.minute-marks li:nth-child( 12):after {
+  -webkit-animation-delay: 0.7310000000000001s;
+  -moz-animation-delay: 0.7310000000000001s;
+  -o-animation-delay: 0.7310000000000001s;
+  animation-delay: 0.7310000000000001s;
+}
+.minute-marks li:nth-child( 13) {
+  -webkit-transform: rotate(72deg);
+  -moz-transform: rotate(72deg);
+  -o-transform: rotate(72deg);
+  -ms-transform: rotate(72deg);
+  transform: rotate(72deg);
+}
+.minute-marks li:nth-child( 13):before {
+  -webkit-animation-delay: 0.22100000000000003s;
+  -moz-animation-delay: 0.22100000000000003s;
+  -o-animation-delay: 0.22100000000000003s;
+  animation-delay: 0.22100000000000003s;
+}
+.minute-marks li:nth-child( 13):after {
+  -webkit-animation-delay: 0.748s;
+  -moz-animation-delay: 0.748s;
+  -o-animation-delay: 0.748s;
+  animation-delay: 0.748s;
+}
+.minute-marks li:nth-child( 14) {
+  -webkit-transform: rotate(78deg);
+  -moz-transform: rotate(78deg);
+  -o-transform: rotate(78deg);
+  -ms-transform: rotate(78deg);
+  transform: rotate(78deg);
+}
+.minute-marks li:nth-child( 14):before {
+  -webkit-animation-delay: 0.23800000000000002s;
+  -moz-animation-delay: 0.23800000000000002s;
+  -o-animation-delay: 0.23800000000000002s;
+  animation-delay: 0.23800000000000002s;
+}
+.minute-marks li:nth-child( 14):after {
+  -webkit-animation-delay: 0.765s;
+  -moz-animation-delay: 0.765s;
+  -o-animation-delay: 0.765s;
+  animation-delay: 0.765s;
+}
+.minute-marks li:nth-child( 15) {
+  -webkit-transform: rotate(84deg);
+  -moz-transform: rotate(84deg);
+  -o-transform: rotate(84deg);
+  -ms-transform: rotate(84deg);
+  transform: rotate(84deg);
+}
+.minute-marks li:nth-child( 15):before {
+  -webkit-animation-delay: 0.255s;
+  -moz-animation-delay: 0.255s;
+  -o-animation-delay: 0.255s;
+  animation-delay: 0.255s;
+}
+.minute-marks li:nth-child( 15):after {
+  -webkit-animation-delay: 0.782s;
+  -moz-animation-delay: 0.782s;
+  -o-animation-delay: 0.782s;
+  animation-delay: 0.782s;
+}
+.minute-marks li:nth-child( 16) {
+  -webkit-transform: rotate(90deg);
+  -moz-transform: rotate(90deg);
+  -o-transform: rotate(90deg);
+  -ms-transform: rotate(90deg);
+  transform: rotate(90deg);
+}
+.minute-marks li:nth-child( 16):before {
+  -webkit-animation-delay: 0.272s;
+  -moz-animation-delay: 0.272s;
+  -o-animation-delay: 0.272s;
+  animation-delay: 0.272s;
+}
+.minute-marks li:nth-child( 16):after {
+  -webkit-animation-delay: 0.799s;
+  -moz-animation-delay: 0.799s;
+  -o-animation-delay: 0.799s;
+  animation-delay: 0.799s;
+}
+.minute-marks li:nth-child( 17) {
+  -webkit-transform: rotate(96deg);
+  -moz-transform: rotate(96deg);
+  -o-transform: rotate(96deg);
+  -ms-transform: rotate(96deg);
+  transform: rotate(96deg);
+}
+.minute-marks li:nth-child( 17):before {
+  -webkit-animation-delay: 0.28900000000000003s;
+  -moz-animation-delay: 0.28900000000000003s;
+  -o-animation-delay: 0.28900000000000003s;
+  animation-delay: 0.28900000000000003s;
+}
+.minute-marks li:nth-child( 17):after {
+  -webkit-animation-delay: 0.8160000000000001s;
+  -moz-animation-delay: 0.8160000000000001s;
+  -o-animation-delay: 0.8160000000000001s;
+  animation-delay: 0.8160000000000001s;
+}
+.minute-marks li:nth-child( 18) {
+  -webkit-transform: rotate(102deg);
+  -moz-transform: rotate(102deg);
+  -o-transform: rotate(102deg);
+  -ms-transform: rotate(102deg);
+  transform: rotate(102deg);
+}
+.minute-marks li:nth-child( 18):before {
+  -webkit-animation-delay: 0.30600000000000005s;
+  -moz-animation-delay: 0.30600000000000005s;
+  -o-animation-delay: 0.30600000000000005s;
+  animation-delay: 0.30600000000000005s;
+}
+.minute-marks li:nth-child( 18):after {
+  -webkit-animation-delay: 0.8330000000000001s;
+  -moz-animation-delay: 0.8330000000000001s;
+  -o-animation-delay: 0.8330000000000001s;
+  animation-delay: 0.8330000000000001s;
+}
+.minute-marks li:nth-child( 19) {
+  -webkit-transform: rotate(108deg);
+  -moz-transform: rotate(108deg);
+  -o-transform: rotate(108deg);
+  -ms-transform: rotate(108deg);
+  transform: rotate(108deg);
+}
+.minute-marks li:nth-child( 19):before {
+  -webkit-animation-delay: 0.323s;
+  -moz-animation-delay: 0.323s;
+  -o-animation-delay: 0.323s;
+  animation-delay: 0.323s;
+}
+.minute-marks li:nth-child( 19):after {
+  -webkit-animation-delay: 0.8500000000000001s;
+  -moz-animation-delay: 0.8500000000000001s;
+  -o-animation-delay: 0.8500000000000001s;
+  animation-delay: 0.8500000000000001s;
+}
+.minute-marks li:nth-child( 20) {
+  -webkit-transform: rotate(114deg);
+  -moz-transform: rotate(114deg);
+  -o-transform: rotate(114deg);
+  -ms-transform: rotate(114deg);
+  transform: rotate(114deg);
+}
+.minute-marks li:nth-child( 20):before {
+  -webkit-animation-delay: 0.34s;
+  -moz-animation-delay: 0.34s;
+  -o-animation-delay: 0.34s;
+  animation-delay: 0.34s;
+}
+.minute-marks li:nth-child( 20):after {
+  -webkit-animation-delay: 0.867s;
+  -moz-animation-delay: 0.867s;
+  -o-animation-delay: 0.867s;
+  animation-delay: 0.867s;
+}
+.minute-marks li:nth-child( 21) {
+  -webkit-transform: rotate(120deg);
+  -moz-transform: rotate(120deg);
+  -o-transform: rotate(120deg);
+  -ms-transform: rotate(120deg);
+  transform: rotate(120deg);
+}
+.minute-marks li:nth-child( 21):before {
+  -webkit-animation-delay: 0.35700000000000004s;
+  -moz-animation-delay: 0.35700000000000004s;
+  -o-animation-delay: 0.35700000000000004s;
+  animation-delay: 0.35700000000000004s;
+}
+.minute-marks li:nth-child( 21):after {
+  -webkit-animation-delay: 0.8840000000000001s;
+  -moz-animation-delay: 0.8840000000000001s;
+  -o-animation-delay: 0.8840000000000001s;
+  animation-delay: 0.8840000000000001s;
+}
+.minute-marks li:nth-child( 22) {
+  -webkit-transform: rotate(126deg);
+  -moz-transform: rotate(126deg);
+  -o-transform: rotate(126deg);
+  -ms-transform: rotate(126deg);
+  transform: rotate(126deg);
+}
+.minute-marks li:nth-child( 22):before {
+  -webkit-animation-delay: 0.374s;
+  -moz-animation-delay: 0.374s;
+  -o-animation-delay: 0.374s;
+  animation-delay: 0.374s;
+}
+.minute-marks li:nth-child( 22):after {
+  -webkit-animation-delay: 0.901s;
+  -moz-animation-delay: 0.901s;
+  -o-animation-delay: 0.901s;
+  animation-delay: 0.901s;
+}
+.minute-marks li:nth-child( 23) {
+  -webkit-transform: rotate(132deg);
+  -moz-transform: rotate(132deg);
+  -o-transform: rotate(132deg);
+  -ms-transform: rotate(132deg);
+  transform: rotate(132deg);
+}
+.minute-marks li:nth-child( 23):before {
+  -webkit-animation-delay: 0.391s;
+  -moz-animation-delay: 0.391s;
+  -o-animation-delay: 0.391s;
+  animation-delay: 0.391s;
+}
+.minute-marks li:nth-child( 23):after {
+  -webkit-animation-delay: 0.918s;
+  -moz-animation-delay: 0.918s;
+  -o-animation-delay: 0.918s;
+  animation-delay: 0.918s;
+}
+.minute-marks li:nth-child( 24) {
+  -webkit-transform: rotate(138deg);
+  -moz-transform: rotate(138deg);
+  -o-transform: rotate(138deg);
+  -ms-transform: rotate(138deg);
+  transform: rotate(138deg);
+}
+.minute-marks li:nth-child( 24):before {
+  -webkit-animation-delay: 0.40800000000000003s;
+  -moz-animation-delay: 0.40800000000000003s;
+  -o-animation-delay: 0.40800000000000003s;
+  animation-delay: 0.40800000000000003s;
+}
+.minute-marks li:nth-child( 24):after {
+  -webkit-animation-delay: 0.935s;
+  -moz-animation-delay: 0.935s;
+  -o-animation-delay: 0.935s;
+  animation-delay: 0.935s;
+}
+.minute-marks li:nth-child( 25) {
+  -webkit-transform: rotate(144deg);
+  -moz-transform: rotate(144deg);
+  -o-transform: rotate(144deg);
+  -ms-transform: rotate(144deg);
+  transform: rotate(144deg);
+}
+.minute-marks li:nth-child( 25):before {
+  -webkit-animation-delay: 0.42500000000000004s;
+  -moz-animation-delay: 0.42500000000000004s;
+  -o-animation-delay: 0.42500000000000004s;
+  animation-delay: 0.42500000000000004s;
+}
+.minute-marks li:nth-child( 25):after {
+  -webkit-animation-delay: 0.9520000000000001s;
+  -moz-animation-delay: 0.9520000000000001s;
+  -o-animation-delay: 0.9520000000000001s;
+  animation-delay: 0.9520000000000001s;
+}
+.minute-marks li:nth-child( 26) {
+  -webkit-transform: rotate(150deg);
+  -moz-transform: rotate(150deg);
+  -o-transform: rotate(150deg);
+  -ms-transform: rotate(150deg);
+  transform: rotate(150deg);
+}
+.minute-marks li:nth-child( 26):before {
+  -webkit-animation-delay: 0.44200000000000006s;
+  -moz-animation-delay: 0.44200000000000006s;
+  -o-animation-delay: 0.44200000000000006s;
+  animation-delay: 0.44200000000000006s;
+}
+.minute-marks li:nth-child( 26):after {
+  -webkit-animation-delay: 0.9690000000000001s;
+  -moz-animation-delay: 0.9690000000000001s;
+  -o-animation-delay: 0.9690000000000001s;
+  animation-delay: 0.9690000000000001s;
+}
+.minute-marks li:nth-child( 27) {
+  -webkit-transform: rotate(156deg);
+  -moz-transform: rotate(156deg);
+  -o-transform: rotate(156deg);
+  -ms-transform: rotate(156deg);
+  transform: rotate(156deg);
+}
+.minute-marks li:nth-child( 27):before {
+  -webkit-animation-delay: 0.459s;
+  -moz-animation-delay: 0.459s;
+  -o-animation-delay: 0.459s;
+  animation-delay: 0.459s;
+}
+.minute-marks li:nth-child( 27):after {
+  -webkit-animation-delay: 0.986s;
+  -moz-animation-delay: 0.986s;
+  -o-animation-delay: 0.986s;
+  animation-delay: 0.986s;
+}
+.minute-marks li:nth-child( 28) {
+  -webkit-transform: rotate(162deg);
+  -moz-transform: rotate(162deg);
+  -o-transform: rotate(162deg);
+  -ms-transform: rotate(162deg);
+  transform: rotate(162deg);
+}
+.minute-marks li:nth-child( 28):before {
+  -webkit-animation-delay: 0.47600000000000003s;
+  -moz-animation-delay: 0.47600000000000003s;
+  -o-animation-delay: 0.47600000000000003s;
+  animation-delay: 0.47600000000000003s;
+}
+.minute-marks li:nth-child( 28):after {
+  -webkit-animation-delay: 1.0030000000000001s;
+  -moz-animation-delay: 1.0030000000000001s;
+  -o-animation-delay: 1.0030000000000001s;
+  animation-delay: 1.0030000000000001s;
+}
+.minute-marks li:nth-child( 29) {
+  -webkit-transform: rotate(168deg);
+  -moz-transform: rotate(168deg);
+  -o-transform: rotate(168deg);
+  -ms-transform: rotate(168deg);
+  transform: rotate(168deg);
+}
+.minute-marks li:nth-child( 29):before {
+  -webkit-animation-delay: 0.49300000000000005s;
+  -moz-animation-delay: 0.49300000000000005s;
+  -o-animation-delay: 0.49300000000000005s;
+  animation-delay: 0.49300000000000005s;
+}
+.minute-marks li:nth-child( 29):after {
+  -webkit-animation-delay: 1.02s;
+  -moz-animation-delay: 1.02s;
+  -o-animation-delay: 1.02s;
+  animation-delay: 1.02s;
+}
+.minute-marks li:nth-child( 30) {
+  -webkit-transform: rotate(174deg);
+  -moz-transform: rotate(174deg);
+  -o-transform: rotate(174deg);
+  -ms-transform: rotate(174deg);
+  transform: rotate(174deg);
+}
+.minute-marks li:nth-child( 30):before {
+  -webkit-animation-delay: 0.51s;
+  -moz-animation-delay: 0.51s;
+  -o-animation-delay: 0.51s;
+  animation-delay: 0.51s;
+}
+.minute-marks li:nth-child( 30):after {
+  -webkit-animation-delay: 1.037s;
+  -moz-animation-delay: 1.037s;
+  -o-animation-delay: 1.037s;
+  animation-delay: 1.037s;
+}
+</style>
+
+            
+        
+            
                 <form action="/search/" class="search-form widget" >
         <p>
             <label>搜索</label>
@@ -282,18 +1893,10 @@
         
         <div class="widget-archive--list">
             <div class="archives-year">
-                    <a href="/archives/#2020">
+                    <a href="/archives/#2026">
                         
-                            <span class="year">2020</span>
-                            <span class="count">1</span>
-                        
-                    </a> 
-                </div>
-            <div class="archives-year">
-                    <a href="/archives/#2019">
-                        
-                            <span class="year">2019</span>
-                            <span class="count">4</span>
+                            <span class="year">2026</span>
+                            <span class="count">2</span>
                         
                     </a> 
                 </div>
@@ -320,24 +1923,12 @@
 
     <div class="tagCloud-tags">
         
-            <a href="/categories/test/" class="font_size_3">
-                Test
+            <a href="/categories/%E8%96%85%E7%BE%8A%E6%AF%9B/" class="font_size_1">
+                薅羊毛
             </a>
         
-            <a href="/categories/syntax/" class="font_size_1">
-                Syntax
-            </a>
-        
-            <a href="/categories/test-with-whitespaces/" class="font_size_1">
-                Test With Whitespaces
-            </a>
-        
-            <a href="/categories/themes/" class="font_size_1">
-                Themes
-            </a>
-        
-            <a href="/categories/%E6%B5%8B%E8%AF%95/" class="font_size_1">
-                测试
+            <a href="/categories/%E9%9A%8F%E5%BF%83%E8%AE%B0/" class="font_size_1">
+                随心记
             </a>
         
     </div>
@@ -358,7 +1949,7 @@
 
         <div class="section-card">
             <div class="section-details">
-                <h3 class="section-count">5 个页面</h3>
+                <h3 class="section-count">2 个页面</h3>
                 <h1 class="section-term">Posts</h1>
                 
             </div>
@@ -368,18 +1959,18 @@
     <section class="article-list--compact">
         
             <article>
-    <a href="/p/test-chinese/">
+    <a href="/p/%E5%85%8D%E8%B4%B9%E4%BA%91%E7%94%B5%E8%84%91%E6%95%99%E7%A8%8B/">
         <div class="article-details">
-            <h2 class="article-title">Chinese Test</h2>
+            <h2 class="article-title">免费云电脑教程</h2>
             <footer class="article-time">
-                <time datetime='2020-09-09T00:00:00Z'>2020-09-09</time>
+                <time datetime='2026-10-02T00:00:00Z'>2026-10-02</time>
             </footer>
         </div>
             <div class="article-image">
-                <img src="/p/test-chinese/helena-hertz-wWZzXlDpMog-unsplash_hu4699868770670889127.jpg" 
+                <img src="/p/%E5%85%8D%E8%B4%B9%E4%BA%91%E7%94%B5%E8%84%91%E6%95%99%E7%A8%8B/fengmian_hu9069673655326150893.jpg" 
                         width="120"
                         height="120" 
-                        alt="Chinese Test"
+                        alt="免费云电脑教程"
                         loading="lazy">
                 
             </div>
@@ -388,38 +1979,18 @@
 </article>
         
             <article>
-    <a href="/p/markdown-syntax-guide/">
+    <a href="/p/%E4%BD%A0%E5%A5%BD%E4%B8%96%E7%95%8C/">
         <div class="article-details">
-            <h2 class="article-title">Markdown Syntax Guide</h2>
+            <h2 class="article-title">你好,世界</h2>
             <footer class="article-time">
-                <time datetime='2019-03-11T00:00:00Z'>2019-03-11</time>
+                <time datetime='2026-09-18T00:00:00Z'>2026-09-18</time>
             </footer>
         </div>
             <div class="article-image">
-                <img src="/p/markdown-syntax-guide/pawel-czerwinski-8uZPynIu-rQ-unsplash_hu6307248181568134095.jpg" 
+                <img src="/p/%E4%BD%A0%E5%A5%BD%E4%B8%96%E7%95%8C/Hello,%20world_hu519339059563266912.jpg" 
                         width="120"
                         height="120" 
-                        alt="Markdown Syntax Guide"
-                        loading="lazy">
-                
-            </div>
-        
-    </a>
-</article>
-        
-            <article>
-    <a href="/p/placeholder-text/">
-        <div class="article-details">
-            <h2 class="article-title">Placeholder Text</h2>
-            <footer class="article-time">
-                <time datetime='2019-03-09T00:00:00Z'>2019-03-09</time>
-            </footer>
-        </div>
-            <div class="article-image">
-                <img src="/p/placeholder-text/matt-le-SJSpo9hQf7s-unsplash_hu10664154974910995856.jpg" 
-                        width="120"
-                        height="120" 
-                        alt="Placeholder Text"
+                        alt="你好,世界"
                         loading="lazy">
                 
             </div>
@@ -428,21 +1999,6 @@
 </article>
         
     </section>
-    <nav class='pagination'>
-        
-        
-
-        
-            
-                <span class='page-link current'>1</span>
-                
-            
-            
-                    <a class='page-link' href='/post/page/2/'>2</a>
-                
-            
-    </nav>
-
 <footer class="site-footer">
     <section class="copyright">
         &copy; 
@@ -453,8 +2009,8 @@
     </section>
     
     <section class="powerby">
-        使用 <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> 构建 <br />
-        主题 <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="3.26.0">Stack</a></b> 由 <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a> 设计
+        Build using Hugo <br />
+        
     </section>
 </footer>
 
@@ -462,14 +2018,14 @@
             </main>
         </div>
         <script 
-                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
+                src="https://cdn.jsdmirror.com/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
                 
                 >
             </script><script type="text/javascript" src="/ts/main.js" defer></script>
 <script>
     (function () {
         const customFont = document.createElement('link');
-        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+        customFont.href = "https://fonts.loli.net/css2?family=Lato:wght@300;400;700&display=swap";
 
         customFont.type = "text/css";
         customFont.rel = "stylesheet";
@@ -477,6 +2033,673 @@
         document.head.appendChild(customFont);
     }());
 </script>
+<style>
+    .welcome-toast {
+        position: fixed;
+        right: 20px;
+        bottom: 20px;
+        z-index: 9999;
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        max-width: 440px;
+        padding: 16px 38px 16px 16px;
+        background: var(--card-background);
+        color: var(--card-text-color-main);
+        border: 1px solid var(--card-separator-color);
+        border-radius: var(--card-border-radius, 12px);
+        box-shadow: 0 10px 34px rgba(0, 0, 0, 0.18);
+        transform: translateX(130%);
+        opacity: 0;
+        pointer-events: none;
+        transition: transform 0.55s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.45s ease;
+    }
+
+    .welcome-toast.is-show {
+        transform: translateX(0);
+        opacity: 1;
+        pointer-events: auto;
+    }
+
+    .welcome-toast__wave {
+        flex-shrink: 0;
+        font-size: 4rem;
+        line-height: 1;
+        display: inline-block;
+        transform-origin: 70% 70%;
+        animation: welcome-wave 1.8s ease-in-out infinite;
+    }
+
+    @keyframes welcome-wave {
+
+        0%,
+        100% {
+            transform: rotate(0deg);
+        }
+
+        20% {
+            transform: rotate(18deg);
+        }
+
+        40% {
+            transform: rotate(-10deg);
+        }
+
+        60% {
+            transform: rotate(14deg);
+        }
+
+        80% {
+            transform: rotate(-6deg);
+        }
+    }
+
+    .welcome-toast__body {
+        min-width: 0;
+    }
+
+    .welcome-toast__greet {
+        margin: 0 0 8px;
+        font-size: 1.4rem;
+        line-height: 1.55;
+        color: var(--card-text-color-main);
+    }
+
+    .welcome-toast__greet b {
+        color: var(--accent-color);
+        font-weight: 600;
+    }
+
+    .welcome-toast__link {
+        display: inline-block;
+        font-size: 1.3rem;
+        line-height: 1.5;
+        white-space: nowrap;
+        color: var(--accent-color);
+        text-decoration: none !important;
+        border-bottom: 1px dashed var(--accent-color);
+        padding-bottom: 1px;
+        transition: opacity 0.2s ease;
+    }
+
+    .welcome-toast__link:hover {
+        opacity: 0.75;
+    }
+
+    .welcome-toast__close {
+        position: absolute;
+        top: 8px;
+        right: 10px;
+        width: 22px;
+        height: 22px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0;
+        border: none;
+        background: none;
+        color: var(--card-text-color-secondary);
+        font-size: 1.8rem;
+        line-height: 1;
+        cursor: pointer;
+        transition: color 0.2s ease, transform 0.2s ease;
+    }
+
+    .welcome-toast__close:hover {
+        color: var(--card-text-color-main);
+        transform: scale(1.15);
+    }
+
+    @media (max-width: 640px) {
+        .welcome-toast {
+            left: 12px;
+            right: 12px;
+            bottom: 12px;
+            max-width: none;
+        }
+    }
+</style>
+
+<div id="welcome-toast" class="welcome-toast" role="dialog" aria-live="polite" aria-label="欢迎通知">
+    <button class="welcome-toast__close" type="button" aria-label="关闭">&times;</button>
+    <span class="welcome-toast__wave" aria-hidden="true">👋</span>
+    <div class="welcome-toast__body">
+        <p class="welcome-toast__greet">泥嚎！来自 <b id="welcome-browser">你的浏览器</b> 的朋友，欢迎来到我的 blog</p>
+        <a class="welcome-toast__link" href="https://github.com/YrqSpace/YrqSpace.github.io/issues/1" target="_blank" rel="noopener">👉 觉得文章有意思？点这里去 GitHub 订阅</a>
+    </div>
+</div>
+
+<script>
+    (function () {
+        function detectBrowser() {
+            var ua = navigator.userAgent;
+            if (/Edg\//.test(ua) || /EdgiOS\//.test(ua)) return 'Edge';
+            if (/OPR\//.test(ua) || /Opera/.test(ua)) return 'Opera';
+            if (/Firefox\//.test(ua) || /FxiOS\//.test(ua)) return 'Firefox';
+            if (/Chrome\//.test(ua) || /CriOS\//.test(ua)) return 'Chrome';
+            if (/Safari\//.test(ua)) return 'Safari';
+            return '浏览器';
+        }
+
+        
+        
+        var KEY = 'welcome-shown';
+
+        function alreadyShown() {
+            try { return sessionStorage.getItem(KEY) === '1'; } catch (e) { return false; }
+        }
+
+        function markShown() {
+            try { sessionStorage.setItem(KEY, '1'); } catch (e) { }
+        }
+
+        function showWelcome() {
+            var toast = document.getElementById('welcome-toast');
+            if (!toast) return;
+
+            
+            if (alreadyShown()) return;
+
+            var browserSpan = document.getElementById('welcome-browser');
+            if (browserSpan) browserSpan.textContent = detectBrowser();
+
+            var closeBtn = toast.querySelector('.welcome-toast__close');
+            if (closeBtn) {
+                closeBtn.addEventListener('click', function () {
+                    toast.classList.remove('is-show');
+                });
+            }
+
+            
+            function reveal() {
+                toast.classList.add('is-show');
+                markShown();
+            }
+
+            function loadingDone() {
+                return !document.documentElement.classList.contains('is-loading');
+            }
+
+            if (loadingDone()) {
+                setTimeout(reveal, 300);
+                return;
+            }
+
+            var done = false;
+            var observer = new MutationObserver(function () {
+                if (!done && loadingDone()) {
+                    done = true;
+                    observer.disconnect();
+                    setTimeout(reveal, 300);
+                }
+            });
+            observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+
+            
+            setTimeout(function () {
+                if (!done) {
+                    done = true;
+                    observer.disconnect();
+                    reveal();
+                }
+            }, 20000);
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', showWelcome);
+        } else {
+            showWelcome();
+        }
+    })();
+</script>
+
+    <script src="https://cdn.jsdmirror.com/npm/aplayer@1.10.1/dist/APlayer.min.js"></script>
+    <div id="aplayer"></div>
+
+    <script>
+        const home = "https://yrqspace.github.io/"
+        const ap = new APlayer({
+            container: document.getElementById('aplayer'),
+            fixed: true,
+            lrcType: 0,
+            audio: [
+    {
+        name: '清空',
+        artist: '王忻辰 苏星婕',
+        url: '/music/qingkong/song.mp3',
+        cover: '/music/qingkong/cover.jpg',
+    },
+    {
+        name: '云烟成雨',
+        artist: '房东的猫',
+        url: '/music/yunyanchengyu/song.mp3',
+        cover: '/music/yunyanchengyu/cover.jpg',
+    },
+    {
+        name: '带我去找夜生活',
+        artist: '告五人',
+        url: '/music/daiwoquzhaoyeshenghuo/song.mp3',
+        cover: '/music/daiwoquzhaoyeshenghuo/cover.jpg',
+    },
+    {
+        name: '等一场雨',
+        artist: '苏星婕',
+        url: '/music/dengyichangyu/song.mp3',
+        cover: '/music/dengyichangyu/cover.jpg',
+    },
+    {
+        name: 'river flows in you',
+        artist: 'Yiruma',
+        url: '/music/river-flows-in-you/song.mp3',
+        cover: '/music/river-flows-in-you/cover.jpg',
+    },
+    {
+        name: 'Kiss The Rain',
+        artist: 'Yiruma',
+        url: '/music/Kiss-The-Rain/song.mp3',
+        cover: '/music/Kiss-The-Rain/cover.jpg',
+    },
+    {
+        name: 'Maybe',
+        artist: 'Yiruma',
+        url: '/music/maybe/song.mp3',
+        cover: '/music/maybe/cover.jpg',
+    },
+    {
+        name: 'Summer',
+        artist: '久石让',
+        url: '/music/summer/song.mp3',
+        cover: '/music/summer/cover.jpg',
+    },
+    {
+        name: 'Merry Christmas Mr. Lawrence',
+        artist: '坂本龙一',
+        url: '/music/merrychristmasmrlawrence/song.mp3',
+        cover: '/music/merrychristmasmrlawrence/cover.jpg',
+    },
+    {
+        name: 'My Soul',
+        artist: 'July',
+        url: '/music/mysoul/song.mp3',
+        cover: '/music/mysoul/cover.jpg',
+    },
+    {
+        name: 'Una Mattina',
+        artist: 'Ludovico Einaudi',
+        url: '/music/unamattina/song.mp3',
+        cover: '/music/unamattina/cover.jpg',
+    },
+    {
+        name: '夜的钢琴曲五',
+        artist: '石进',
+        url: '/music/yedegangqinquwu/song.mp3',
+        cover: '/music/yedegangqinquwu/cover.jpg',
+    },
+    {
+        name: 'Flower Dance',
+        artist: 'DJ Okawari',
+        url: '/music/flowerdance/song.mp3',
+        cover: '/music/flowerdance/cover.jpg',
+    },
+    {
+        name: 'Harbor',
+        artist: 'Tomppabeats',
+        url: '/music/harbor/song.mp3',
+        cover: '/music/harbor/cover.jpg',
+    },
+    {
+        name: 'Controlla',
+        artist: 'Drake',
+        url: '/music/controlla/song.mp3',
+        cover: '/music/controlla/cover.jpg',
+    }
+]
+
+    });
+
+
+   
+
+    window.onbeforeunload = () => {
+        
+        const playInfo = {
+            index: ap.list.index,
+            currentTime: ap.audio.currentTime,
+            paused: ap.paused
+        };
+        localStorage.setItem("playInfo", JSON.stringify(playInfo));
+    };
+
+    
+
+    window.onload = () => {
+        
+        const playInfo = JSON.parse(localStorage.getItem("playInfo"));
+        if (!playInfo) {
+            return;
+        }
+        
+        ap.list.switch(playInfo.index);
+        
+        setTimeout(() => {
+            
+            ap.seek(playInfo.currentTime);
+            
+            if (!playInfo.paused) {
+                ap.play()
+            }
+        }, 500);
+    };
+
+
+
+    </script>
+
+<script src="/js/pjax.min.js"></script>
+<script src="/js/topbar.min.js"></script>
+<script>
+  window.__giscusConfig = {
+    repo: "YrqSpace/Giscus",
+    repoId: "R_kgDOUhG6JA",
+    category: "Announcements",
+    categoryId: "DIC_kwDOUhG6JM4DF78m",
+    mapping: "pathname",
+    strict: 0,
+    reactionsEnabled: 1,
+    emitMetadata: 0,
+    inputPosition: "top",
+    lightTheme: "light",
+    darkTheme: "dark",
+    lang: "zh-CN"
+  };
+</script><link rel="stylesheet" href="/vendor/waline/waline.css">
+<script>
+window.__walineCfg = {"dark":"html[data-scheme=\"dark\"]","el":"#waline","emoji":["https://cdn.jsdmirror.com/npm/@waline/emojis@1.0.1/weibo"],"lang":"zh-CN","locale":{"admin":"Admin"},"requiredMeta":["name","email","url"],"serverURL":"https://yrq1622.cc.cd"};
+(function () {
+  var WALINE_URL = '\/vendor\/waline\/waline.js';
+  var bootAttempts = 0;
+
+  function loadModule() {
+    
+    if (!window.__walineModulePromise) {
+      window.__walineModulePromise = import(WALINE_URL);
+    }
+    return window.__walineModulePromise;
+  }
+
+  window.__walineBoot = function () {
+    var el = document.getElementById('waline');
+    if (!el) {
+      
+      if (bootAttempts < 40) {
+        bootAttempts++;
+        setTimeout(window.__walineBoot, 200);
+      }
+      return;
+    }
+    if (el.dataset.wlMounted === '1' || el.dataset.wlMounting === '1') return;
+
+    el.dataset.wlMounting = '1';
+    loadModule().then(function (m) {
+      var init = (m && (m.init || (m.default && m.default.init))) || (window.Waline && window.Waline.init);
+      if (typeof init !== 'function') throw new Error('waline init not found');
+      
+      var mountEl = document.getElementById('waline');
+      if (!mountEl) {
+        el.dataset.wlMounting = '';
+        return;
+      }
+      mountEl.innerHTML = '';
+      init(window.__walineCfg);
+      
+      mountEl.dataset.wlMounted = '1';
+      mountEl.dataset.wlMounting = '';
+      bootAttempts = 0;
+    }).catch(function (e) {
+      
+      window.__walineModulePromise = null;
+      var mountEl = document.getElementById('waline');
+      if (mountEl) mountEl.dataset.wlMounting = '';
+      console.error('[waline] load failed', e);
+    });
+  };
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', function () { window.__walineBoot(); });
+  } else {
+    window.__walineBoot();
+  }
+})();
+</script><script>
+(function () {
+  
+  if (typeof Pjax === "undefined") {
+    console.warn("[pjax] 库未加载，已跳过无刷新初始化");
+    return;
+  }
+
+  var pjax = new Pjax({
+    selectors: [".main-container"],
+    
+    timeout: 15000
+  });
+
+  
+  
+  window.pjax = pjax;
+
+  
+  var rawHandleResponse = pjax.handleResponse.bind(pjax);
+
+  
+  pjax.handleResponse = function (responseText, request, href, options) {
+    try {
+      var newDom = new DOMParser().parseFromString(responseText, "text/html");
+      if (newDom && newDom.body) {
+        if (newDom.body.className) {
+          document.body.setAttribute("class", newDom.body.className);
+        }
+        window.__pjaxHasComments = !!newDom.body.querySelector('script[src="https://giscus.app/client.js"]');
+      }
+    } catch (e) {
+      console.warn("[pjax] 同步 body class 失败", e);
+    }
+    
+    return rawHandleResponse(responseText, request, href, options);
+  };
+
+  
+  if (window.topbar && typeof topbar.config === "function") {
+    topbar.config({
+      barColors: {
+        "0": "rgba(255,  255, 255, 1)", 
+        "1.0": "rgba(0, 149, 234,  1)" 
+      }
+    });
+  }
+
+  document.addEventListener("pjax:send", function () {
+    if (window.topbar && typeof topbar.show === "function") topbar.show();
+  });
+
+  document.addEventListener("pjax:complete", function () {
+    if (window.Stack && typeof Stack.init === "function") Stack.init();
+    if (window.topbar && typeof topbar.hide === "function") topbar.hide();
+
+    
+    if (typeof initScrollTop === "function") initScrollTop();
+    if (typeof initTocHide === "function") initTocHide();
+
+    
+    if (window.__walineBoot) window.__walineBoot();
+
+    var cfg = window.__giscusConfig;
+    if (!cfg || !window.__pjaxHasComments) return;
+    var main = document.querySelector(".main-container main") || document.querySelector("main");
+    if (!main) return;
+    main.querySelectorAll(".giscus").forEach(function (el) { el.remove(); });
+    var oldScript = main.querySelector('script[src="https://giscus.app/client.js"]');
+    var script = document.createElement("script");
+    script.src = "https://giscus.app/client.js";
+    script.setAttribute("data-repo", cfg.repo);
+    script.setAttribute("data-repo-id", cfg.repoId);
+    script.setAttribute("data-category", cfg.category);
+    script.setAttribute("data-category-id", cfg.categoryId);
+    script.setAttribute("data-mapping", cfg.mapping);
+    script.setAttribute("data-strict", cfg.strict);
+    script.setAttribute("data-reactions-enabled", cfg.reactionsEnabled);
+    script.setAttribute("data-emit-metadata", cfg.emitMetadata);
+    script.setAttribute("data-input-position", cfg.inputPosition);
+    script.setAttribute("data-theme", document.documentElement.dataset.scheme === "dark" ? cfg.darkTheme : cfg.lightTheme);
+    script.setAttribute("data-lang", cfg.lang);
+    script.setAttribute("crossorigin", "anonymous");
+    script.async = true;
+    if (oldScript) {
+      oldScript.parentNode.insertBefore(script, oldScript);
+      oldScript.parentNode.removeChild(oldScript);
+    } else {
+      var anchor = main.querySelector(".site-footer");
+      if (anchor) {
+        main.insertBefore(script, anchor);
+      } else {
+        main.appendChild(script);
+      }
+    }
+  });
+})();
+</script>
+
+
+
+<style>
+     
+    #TableOfContents ul,
+    #TableOfContents ol {
+        display: block;
+    }
+</style>
+
+<script>
+    function initTocHide() {
+        
+        let toc = document.querySelector(".widget--toc");
+        if (!toc) {
+            return;
+        }
+        
+        window.addEventListener('scroll', function() {
+            
+            let openUl = document.querySelectorAll(".open");
+            if (openUl.length > 0) {
+              openUl.forEach((ul) => {
+                ul.classList.remove("open")
+              })
+            }
+            
+            let currentLi = document.querySelector(".active-class");
+            if (!currentLi) {
+                return
+            }
+            
+            if (currentLi.children.length > 1) {
+                currentLi.children[1].classList.add("open")
+            }
+            
+            let ul = currentLi.parentElement;
+            do {
+                ul.classList.add("open");
+                ul = ul.parentElement.parentElement
+            } while (ul !== undefined && (ul.localName === 'ul' || ul.localName === 'ol'))
+        });
+    }
+    initTocHide()
+</script>
+
+
+
+<style>
+    #backTopBtn {
+        display: none;
+        position: fixed;
+        bottom: 30px;
+        z-index: 99;
+        cursor: pointer;
+        width: 30px;
+        height: 30px;
+        background-image: url(https://yrqspace.github.io/icons/backTop.svg);
+    }
+</style>
+
+<script>
+    
+
+    function initScrollTop() {
+        
+        let rightSideBar = document.querySelector(".right-sidebar");
+        
+        document.querySelectorAll("#backTopBtn").forEach(function (el) { el.remove(); });
+        let btn = document.createElement("div");
+        btn.id = "backTopBtn";
+        btn.onclick = backToTop;
+        if (rightSideBar) {
+            rightSideBar.appendChild(btn);
+        } else {
+            
+            btn.style.right = "30px";
+            document.body.appendChild(btn);
+        }
+        
+        function updateBackTop() {
+            
+            if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
+                btn.style.display = "block";
+            } else {
+                btn.style.display = "none";
+            }
+        }
+        
+        window.removeEventListener("scroll", window.__backTopScroll);
+        window.__backTopScroll = updateBackTop;
+        window.addEventListener("scroll", window.__backTopScroll);
+        updateBackTop();
+    }
+
+    
+
+    function backToTop(){
+        window.scrollTo({ top: 0, behavior: "smooth" })
+    }
+
+    initScrollTop();
+</script>
+
+
+<div id="particles-js"></div>
+
+<script src=/background/particles.min.09affa0437110080ad681658ee9575ac9210aeef4818cad705ea1903a4016691.js></script>
+<script>
+    particlesJS.load('particles-js', "/background/particlesjs-config.6f1ccc862db9a94bafa23a832507b6207cf71f420cc6a68c8427bff2a320f395.json", function() {
+        console.log('particles.js loaded - callback');
+    });
+</script>
+
+<style>
+    #particles-js {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: -1;
+        pointer-events: none;
+    }
+</style>
+
+
+<script src=/background/fish.9a6f557c6803ec27ad4d8c49dbd42095eb8a1236eac60d90ffa5ef6b512f36f3.js></script>
+
+
+
 
     </body>
 </html>

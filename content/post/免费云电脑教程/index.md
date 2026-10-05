@@ -2,7 +2,7 @@
 title: 免费云电脑教程
 date: 2026-10-02
 slug: 免费云电脑教程
-image: fengmian.jpg
+image: https://gcore.jsdelivr.net/gh/YrqSpace/hugo-pic-bed@main/2026/10/2026-10-02-cover.jpg
 categories:
     - 薅羊毛
 ---
@@ -62,7 +62,7 @@ categories:
 
 审核完成后，再次来到添加用户页面，你会看到：
 
-![](1.jpg)
+![](2026-10-02-1.jpg)
 
 ---
 
@@ -70,6 +70,6 @@ categories:
 
 ## 参考
 
-- [蓝天新世界](https://hiltyun.com/) 💡
+- [蓝天新世界](https://gcore.jsdelivr.net/gh/YrqSpace/hugo-pic-bed@main/2026/10/2026-10-02-1.jpg) 💡
 
 在 QQ 群中，发送"签到"，蓝天 BOT 会额外给你增长 Þ 哦~（在[网页中可以另外签到](https://hiltyun.com/console/#/qiandao)哦）

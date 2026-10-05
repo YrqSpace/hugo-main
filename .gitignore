@@ -10,3 +10,6 @@ hugo.exe
 .DS_Store
 Thumbs.db
 Desktop.ini
+
+.tb_probe.txt
+_writetest.tmp

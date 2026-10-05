@@ -2,7 +2,7 @@
 title: 你好,世界
 date: 2026-09-18
 slug: 你好,世界
-image: Hello, world.jpg
+image: 2026-09-18-cover.jpg
 categories:
     - 随心记
 ---

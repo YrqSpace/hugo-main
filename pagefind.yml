@@ -17,8 +17,9 @@ output_path: "public/pagefind"
 # 强制按中文分词，避免中文字符被当作无空格英文切分
 force_language: "zh"
 
-# 只索引文章正文区块，防止把导航栏 / 侧边栏 / 列表页 / 评论一起收录
-root_selector: ".article-content"
+# 索引整篇文章区块（含文章标题 + 正文），确保标题里的关键词也能被搜到
+# 注意：不要用 ".article-content"，那样会把标题(h1)排除，短文章会搜不到
+root_selector: ".main-article"
 
 # 双保险：即使正文外的区块被并入，也在此显式排除噪音
 exclude_selectors:

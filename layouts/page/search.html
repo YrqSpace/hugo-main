@@ -1,116 +1,31 @@
 {{ define "body-class" }}template-search{{ end }}
 
-{{ define "head" }}
-    {{/* Pagefind UI 样式（构建后由 public/pagefind 提供） */}}
-    <link rel="stylesheet" href="/pagefind/pagefind-ui.css">
-    <style>
-        #search {
-            --pagefind-ui-primary: var(--accent-color);
-            --pagefind-ui-text: var(--card-text-color-main);
-            --pagefind-ui-background: var(--card-background);
-            --pagefind-ui-border: var(--card-separator-color);
-            --pagefind-ui-tag: var(--card-background-selected);
-            --pagefind-ui-border-width: 1px;
-            --pagefind-ui-border-radius: var(--card-border-radius);
-            --pagefind-ui-font: var(--base-font-family);
-        }
-        .search-page-wrap { width: 100%; max-width: 900px; margin: 0 auto; padding-top: 2.5rem; }
-        #search .pagefind-ui__search-input { font-weight: 400; }
-        #search .pagefind-ui__result-link { color: var(--accent-color); }
-        #pf-hint { display: none; margin-top: 1rem; font-size: .9rem; color: var(--card-text-color-secondary); }
-    </style>
-{{ end }}
-
 {{ define "main" }}
+{{/* 搜索页样式放在 main 内（随 .main-container 被 PJAX 一起替换，避免无刷新进入时丢样式） */}}
+<style>
+    #search {
+        --pagefind-ui-primary: var(--accent-color);
+        --pagefind-ui-text: var(--card-text-color-main);
+        --pagefind-ui-background: var(--card-background);
+        --pagefind-ui-border: var(--card-separator-color);
+        --pagefind-ui-tag: var(--card-background-selected);
+        --pagefind-ui-border-width: 1px;
+        --pagefind-ui-border-radius: var(--card-border-radius);
+        --pagefind-ui-font: var(--base-font-family);
+    }
+    .search-page-wrap { width: 100%; max-width: 900px; margin: 0 auto; padding-top: 2.5rem; }
+    #search .pagefind-ui__search-input { font-weight: 400; }
+    #search .pagefind-ui__result-link { color: var(--accent-color); }
+    #pf-hint { display: none; margin-top: 1rem; font-size: .9rem; color: var(--card-text-color-secondary); }
+</style>
+
 <div class="search-page-wrap">
     <h1 class="section-title">{{ T "search.title" }}</h1>
 
-    {{/* Pagefind 挂载点 */}}
+    {{/* Pagefind 挂载点：样式/脚本/初始化由全局脚本(footer/custom.html)统一处理 */}}
     <div id="search"></div>
     <p id="pf-hint"></p>
 </div>
-
-{{/* Pagefind UI：加载后注册全局 PagefindUI；onerror 用于识别资源缺失 */}}
-<script src="/pagefind/pagefind-ui.js" onerror="window.__pfLoadError = true;"></script>
-<script>
-(function () {
-    // 读取从首页/侧栏带过来的关键词（?keyword=xxx，兼容 ?q=xxx）
-    function getTerm() {
-        try {
-            var p = new URLSearchParams(window.location.search);
-            return p.get('keyword') || p.get('q') || '';
-        } catch (e) { return ''; }
-    }
-
-    window.__pfMount = function () {
-        var el = document.getElementById('search');
-        if (!el) return;
-
-        if (typeof PagefindUI === 'undefined' || window.__pfLoadError) {
-            var hint = document.getElementById('pf-hint');
-            if (hint) {
-                hint.style.display = 'block';
-                hint.textContent = '对不起,出了些问题,请刷新页面重试。';
-            }
-            return;
-        }
-
-        // 首次挂载 Pagefind UI
-        if (el.dataset.pfMounted !== '1') {
-            el.innerHTML = '';
-            new PagefindUI({
-                element: "#search",
-                showSubResults: true,
-                showImages: false,
-                resetStyles: false,
-                translations: {
-                    placeholder: "搜索文章…",
-                    clear_search: "清空",
-                    load_more: "加载更多结果",
-                    search_label: "搜索本站",
-                    filters_label: "筛选",
-                    zero_results: "没有找到与 “[SEARCH_TERM]” 相关的内容",
-                    many_results: "找到 [COUNT] 条与 “[SEARCH_TERM]” 相关的结果",
-                    one_result: "找到 1 条与 “[SEARCH_TERM]” 相关的结果",
-                    alt_search: "未找到 “[SEARCH_TERM]”，改为显示 “[DIFFERENT_TERM]” 的结果",
-                    search_suggestion: "未找到 “[SEARCH_TERM]”，请尝试以下关键词之一：",
-                    searching: "搜索中…"
-                }
-            });
-            el.dataset.pfMounted = '1';
-        }
-
-        // 把首页带过来的关键词自动填入并触发搜索
-        var term = getTerm();
-        if (term) {
-            var input = el.querySelector('.pagefind-ui__search-input');
-            if (input && input.value !== term) {
-                input.value = term;
-                input.dispatchEvent(new Event('input', { bubbles: true }));
-                try { input.focus(); } catch (e) {}
-            }
-        }
-
-        var hint = document.getElementById('pf-hint');
-        if (hint) hint.style.display = 'none';
-    };
-
-    // 首次加载：文档已就绪则立即执行，否则等 DOMContentLoaded
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', function () { setTimeout(window.__pfMount, 0); });
-    } else {
-        setTimeout(window.__pfMount, 0);
-    }
-
-    // PJAX 无刷新切换后重新处理（.main-container 被替换，DOMContentLoaded 不会再触发）
-    if (!window.__pfPjaxBound) {
-        window.__pfPjaxBound = true;
-        document.addEventListener('pjax:complete', function () {
-            setTimeout(window.__pfMount, 0);
-        });
-    }
-})();
-</script>
 
 {{ partialCached "footer/footer" . }}
 {{ end }}

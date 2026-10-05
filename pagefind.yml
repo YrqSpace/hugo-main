@@ -1,0 +1,34 @@
+# ------------------------------------------------------------------
+# Pagefind 配置 —— Hugo 站内搜索（中文全站）
+#
+# 使用方式（在 blog 根目录执行）：
+#   1) 先构建静态站点：  hugo
+#   2) 再生成搜索索引：  npx -y pagefind
+#   生成的索引位于  public\pagefind\ ，会随站点一起发布。
+# ------------------------------------------------------------------
+
+# 要建立索引的已构建站点目录
+site: "public"
+
+# 索引输出目录：相对当前运行目录(blog 根)，即 public/pagefind
+# 注意：必须写成 public/pagefind，否则会写到 public 之外，网页访问 /pagefind/ 会 404
+output_path: "public/pagefind"
+
+# 强制按中文分词，避免中文字符被当作无空格英文切分
+force_language: "zh"
+
+# 只索引文章正文区块，防止把导航栏 / 侧边栏 / 列表页 / 评论一起收录
+root_selector: ".article-content"
+
+# 双保险：即使正文外的区块被并入，也在此显式排除噪音
+exclude_selectors:
+  - ".comments"
+  - "#comments"
+  - ".post-comments"
+  - ".giscus"
+  - ".article-footer"
+  - ".related-content"
+  - ".widget--toc"
+  - ".menu-social"
+  - ".left-sidebar"
+  - ".right-sidebar"

@@ -1,0 +1,97 @@
+{{ define "body-class" }}template-search{{ end }}
+
+{{ define "head" }}
+    {{/* Pagefind UI 样式（构建后由 public/pagefind 提供） */}}
+    <link rel="stylesheet" href="/pagefind/pagefind-ui.css">
+    <style>
+        #search {
+            --pagefind-ui-primary: var(--accent-color);
+            --pagefind-ui-text: var(--card-text-color-main);
+            --pagefind-ui-background: var(--card-background);
+            --pagefind-ui-border: var(--card-separator-color);
+            --pagefind-ui-tag: var(--card-background-selected);
+            --pagefind-ui-border-width: 1px;
+            --pagefind-ui-border-radius: var(--card-border-radius);
+            --pagefind-ui-font: var(--base-font-family);
+        }
+        .search-page-wrap { width: 100%; max-width: 900px; margin: 0 auto; }
+        #search .pagefind-ui__search-input { font-weight: 400; }
+        #search .pagefind-ui__result-link { color: var(--accent-color); }
+        #pf-hint { display: none; margin-top: 1rem; font-size: .9rem; color: var(--card-text-color-secondary); }
+    </style>
+{{ end }}
+
+{{ define "main" }}
+<div class="search-page-wrap">
+    <h1 class="section-title">{{ T "search.title" }}</h1>
+
+    {{/* Pagefind 挂载点 */}}
+    <div id="search"></div>
+    <p id="pf-hint"></p>
+</div>
+
+{{/* Pagefind UI：加载后注册全局 PagefindUI；onerror 用于识别资源缺失 */}}
+<script src="/pagefind/pagefind-ui.js" onerror="window.__pfLoadError = true;"></script>
+<script>
+(function () {
+    window.__pfMount = function () {
+        var el = document.getElementById('search');
+        if (!el) return;
+        if (el.dataset.pfMounted === '1') return;
+
+        if (typeof PagefindUI === 'undefined' || window.__pfLoadError) {
+            var hint = document.getElementById('pf-hint');
+            if (hint) {
+                hint.style.display = 'block';
+                hint.textContent = '搜索索引尚未生成：请先构建站点并运行 pagefind，再用静态服务器打开 public/ 目录（hugo server 不会提供 /pagefind/ 资源）。';
+            }
+            return;
+        }
+
+        el.innerHTML = '';
+        new PagefindUI({
+            element: "#search",
+            showSubResults: true,
+            showImages: false,
+            resetStyles: false,
+            translations: {
+                placeholder: "搜索文章…",
+                clear_search: "清空",
+                load_more: "加载更多结果",
+                search_label: "搜索本站",
+                filters_label: "筛选",
+                zero_results: "没有找到与 “[SEARCH_TERM]” 相关的内容",
+                many_results: "找到 [COUNT] 条与 “[SEARCH_TERM]” 相关的结果",
+                one_result: "找到 1 条与 “[SEARCH_TERM]” 相关的结果",
+                alt_search: "未找到 “[SEARCH_TERM]”，改为显示 “[DIFFERENT_TERM]” 的结果",
+                search_suggestion: "未找到 “[SEARCH_TERM]”，请尝试以下关键词之一：",
+                searching: "搜索中…"
+            }
+        });
+        el.dataset.pfMounted = '1';
+
+        var hint = document.getElementById('pf-hint');
+        if (hint) hint.style.display = 'none';
+    };
+
+    // 首次加载：文档已就绪则立即执行，否则等 DOMContentLoaded
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', window.__pfMount);
+    } else {
+        window.__pfMount();
+    }
+
+    // PJAX 无刷新切换后重新挂载（.main-container 被替换，DOMContentLoaded 不会再触发）
+    if (!window.__pfPjaxBound) {
+        window.__pfPjaxBound = true;
+        document.addEventListener('pjax:complete', function () {
+            var el = document.getElementById('search');
+            if (el) el.dataset.pfMounted = '';
+            if (typeof window.__pfMount === 'function') window.__pfMount();
+        });
+    }
+})();
+</script>
+
+{{ partialCached "footer/footer" . }}
+{{ end }}

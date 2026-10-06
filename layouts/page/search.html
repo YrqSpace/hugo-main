@@ -18,22 +18,25 @@
     #search .pagefind-ui__result-link { color: var(--accent-color); }
     #pf-hint { display: none; margin-top: 1rem; font-size: .9rem; color: var(--card-text-color-secondary); }
 
-    /* 清空按钮：隐藏“清空”文字，改为 Tabler × 图标（随主题文字色自适应） */
+    /* 清空按钮：隐藏“清空”文字，改为 Tabler × 图标（随主题文字色自适应）
+       注意：不要覆盖 Pagefind 的 position:absolute（否则按钮会掉到输入框下一行），
+       只调整尺寸/内边距并用遮罩把内容替换成 × 图标 */
     #search .pagefind-ui__search-clear {
         color: transparent;
         font-size: 0;
         line-height: 0;
+        width: calc(58px * var(--pagefind-ui-scale));
+        padding: 0;
         overflow: hidden;
         background-color: transparent;
-        position: relative;
     }
     #search .pagefind-ui__search-clear::before {
         content: "";
         position: absolute;
         inset: 0;
         margin: auto;
-        width: 20px;
-        height: 20px;
+        width: calc(18px * var(--pagefind-ui-scale));
+        height: calc(18px * var(--pagefind-ui-scale));
         background-color: var(--pagefind-ui-text);
         opacity: .55;
         -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M18 6l-12 12'/%3E%3Cpath d='M6 6l12 12'/%3E%3C/svg%3E") center / contain no-repeat;

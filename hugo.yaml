@@ -106,7 +106,8 @@ params:
             lang: zh-CN
             pageview:
             emoji:
-                - https://cdn.jsdmirror.com/npm/@waline/emojis@1.0.1/weibo
+                - https://unpkg.com/@waline/emojis@1.4.0/bmoji
+                - https://unpkg.com/@waline/emojis@1.4.0/bilibili
             requiredMeta:
                 - name
                 - email

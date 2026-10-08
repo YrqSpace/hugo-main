@@ -30,9 +30,7 @@
 	{{ with $Height }}height="{{ . }}"{{ end }}
 	{{ with $Srcset }}srcset="{{ . }}"{{ end }}
 	loading="lazy"
-	{{ with $alt }}
-		alt="{{ . }}"
-	{{ end }}
+	alt="{{ if $alt }}{{ $alt }}{{ else if .Page.Title }}{{ .Page.Title }} - 配图{{ else }}{{ path.Base .Destination }}{{ end }}"
 	{{ if $galleryImage }}
 		class="gallery-image" 
 		data-flex-grow="{{ div (mul $image.Width 100) $image.Height }}"

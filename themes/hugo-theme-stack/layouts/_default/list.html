@@ -35,9 +35,9 @@
                         <img src="{{ $Permalink }}" 
                             width="{{ $Width }}"
                             height="{{ $Height }}" 
-                            loading="lazy">
+                            loading="lazy" alt="{{ .Title }}">
                     {{ else }}
-                        <img src="{{ $image.permalink }}" loading="lazy" />
+                        <img src="{{ $image.permalink }}" loading="lazy" alt="{{ .Title }}" />
                     {{ end }}
                 </div>
             {{ end }}

@@ -1,10 +1,11 @@
 ---
-title: 免费云电脑教程
+title: 免费云电脑获取与认证教程
 date: 2026-10-02
 slug: 免费云电脑教程
 image: https://gcore.jsdelivr.net/gh/YrqSpace/hugo-pic-bed@main/2026/10/2026-10-02-cover.jpg
 categories:
     - 薅羊毛
+description: 在 hiltyun 公益专区做任务赚牛马币，购买免费云电脑，提交工单完成认证后即可开始使用。    
 ---
 
 > 可惜管理员权限要另外花 Þ（牛马币）

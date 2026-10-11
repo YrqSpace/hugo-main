@@ -51,19 +51,18 @@ description: 在 hiltyun 公益专区做任务赚牛马币，购买免费云电�
 
 需要准备的截图：
 
-1. **群聊活跃度 > lv2**：请去 QQ 群发送超过 10 条信息，但不能敷衍。
-2. **三连**：去 3 连【B站最新的 2 个视频】并且截图发送到工单！视频：[第一个](https://www.bilibili.com/video/BV1fBuB6AEb5/?share_source=copy_web)、[第二个](https://www.bilibili.com/video/BV12Vgb6pE8d/?share_source=copy_web&vd_source=f4bbe11cd853124a3d96e00b41efffe5)。
+1. **群聊活跃度 > lv2**：去 QQ 群发送超过 10 条信息，但不能敷衍。
+2. **三连**：去 3 连【B站最新的 2 个视频】并且截图发送到工单！
 3. **评论与弹幕**：请去最新的视频发一个评论与弹幕。
-
+视频：[第一个](https://www.bilibili.com/video/BV1fBuB6AEb5/?share_source=copy_web)、[第二个](https://www.bilibili.com/video/BV12Vgb6pE8d/?share_source=copy_web&vd_source=f4bbe11cd853124a3d96e00b41efffe5)。
 最后：
-
 - 点提交
 - 耐心等待工单审核完成
 
 
 审核完成后，再次来到添加用户页面，你会看到：
 
-![](2026-10-02-1.jpg)
+![](https://gcore.jsdelivr.net/gh/YrqSpace/hugo-pic-bed@main/2026/10/2026-10-02-1.jpg)
 
 ---
 
@@ -71,6 +70,6 @@ description: 在 hiltyun 公益专区做任务赚牛马币，购买免费云电�
 
 ## 参考
 
-- [蓝天新世界](https://gcore.jsdelivr.net/gh/YrqSpace/hugo-pic-bed@main/2026/10/2026-10-02-1.jpg) 💡
+- [蓝天新世界](https://hiltyun.com) 
 
-在 QQ 群中，发送"签到"，蓝天 BOT 会额外给你增长 Þ 哦~（在[网页中可以另外签到](https://hiltyun.com/console/#/qiandao)哦）
+💡在 QQ 群中，发送"签到"，蓝天 BOT 会额外给你增长 Þ 哦~（在[网页中可以另外签到](https://hiltyun.com/console/#/qiandao)哦）

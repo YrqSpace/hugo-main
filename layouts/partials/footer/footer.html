@@ -1,0 +1,57 @@
+{{- $ThemeVersion := "3.26.0" -}}
+{{- /* ===== 全站统计 ===== */ -}}
+{{- $posts := where .Site.RegularPages "Type" "post" -}}
+{{- $postCount := len $posts -}}
+{{- $totalWords := 0 -}}
+{{- range $posts -}}
+    {{- $totalWords = add $totalWords .WordCount -}}
+{{- end -}}
+{{- $wan := div $totalWords 10000.0 -}}
+{{- $runDays := 0 -}}
+{{- with $posts -}}
+    {{- $firstPost := index (sort . "Date") 0 -}}
+    {{- $runDays = int (div (sub now.Unix $firstPost.Date.Unix) 86400) -}}
+{{- end -}}
+<footer class="site-footer">
+    <section class="site-stats">
+        <span>共 {{ $postCount }} 篇文章</span>
+        <span class="dot">·</span>
+        <span>约 {{ printf "%.1f" $wan }} 万字</span>
+        <span class="dot">·</span>
+        <span>运行 {{ $runDays }} 天</span>
+    </section>
+
+    <section class="copyright">
+        &copy; 
+        {{ if and (.Site.Params.footer.since) (ne .Site.Params.footer.since (int (now.Format "2006"))) }}
+            {{ .Site.Params.footer.since }} - 
+        {{ end }}
+        {{ now.Format "2006" }} {{ default .Site.Title .Site.Copyright }}
+    </section>
+    
+    <section class="powerby">
+        {{ with .Site.Params.footer.customText }}
+            {{ . | safeHTML }} <br/>
+        {{ end }}
+
+        {{- $Generator := `<a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a>` -}}
+        {{- $Theme := printf `<b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="%s">Stack</a></b>` $ThemeVersion -}}
+        {{- $DesignedBy := `<a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a>` -}}
+
+        {{ T "footer.builtWith" (dict "Generator" $Generator) | safeHTML }} <br />
+        {{ T "footer.designedBy" (dict "Theme" $Theme "DesignedBy" $DesignedBy) | safeHTML }}
+    </section>
+</footer>
+
+<style>
+    .site-footer .site-stats {
+        text-align: center;
+        font-size: 14px;
+        color: var(--card-text-color-secondary);
+        margin-bottom: 8px;
+    }
+    .site-footer .site-stats .dot {
+        margin: 0 6px;
+        opacity: .6;
+    }
+</style>

@@ -1,8 +1,8 @@
 baseurl: https://yrqspace.github.io/
-languageCode: en-us
+languageCode: zh-cn
 theme: hugo-theme-stack
 paginate: 5
-title: Example Site
+title: 爱玩win11的me
 copyright: 爱玩win11的me
 
 # Theme i18n support
@@ -19,7 +19,7 @@ languages:
         title: 爱玩win11的me
         weight: 2
         params:
-            description: 演示说明
+            description: 记录折腾博客的日常
 
 services:
     # Change it to your Disqus shortname before using

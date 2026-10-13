@@ -50,7 +50,7 @@ params:
         lastUpdated: Jan 02, 2006 15:04 MST
 
     sidebar:
-        emoji: 🍥
+        emoji: 🤔
         subtitle: 欢迎来到我的博客
         avatar:
             enabled: true

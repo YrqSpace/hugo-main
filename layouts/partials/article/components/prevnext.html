@@ -1,3 +1,4 @@
+{{- if eq .Section "post" -}}
 {{- $prev := .PrevInSection -}}
 {{- $next := .NextInSection -}}
 {{- if or $prev $next -}}
@@ -71,4 +72,5 @@
     <span class="placeholder"></span>
     {{- end }}
 </div>
+{{- end -}}
 {{- end -}}

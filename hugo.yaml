@@ -42,7 +42,7 @@ params:
     # e.g.: favicon placed in `static/favicon.ico` of your site folder, then set this field to `/favicon.ico` (`/` is necessary)
 
     footer:
-        since: 2020
+        since: 2024
         customText:
 
     dateFormat:
@@ -63,8 +63,7 @@ params:
         readingTime: true
         license:
             enabled: true
-            default: Licensed under CC BY-NC-SA 4.0
-
+            default: 根据 CC BY-NC-SA 4.0 协议许可
     comments:
         enabled: true
         provider: waline

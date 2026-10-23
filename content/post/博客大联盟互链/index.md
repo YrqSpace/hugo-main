@@ -2,6 +2,7 @@
 title: "给博客加上博客大联盟，把展示权重刷到 113"
 description: "提交、验证、审核、互链，四个步骤踩了三个坑：@ 引用被当成网址、后台填了首页却没往首页放链接、中文路径爬虫抓不到。最后拿到满分 113。"
 date: 2026-10-23T22:40:00+08:00
+image: https://gcore.jsdelivr.net/gh/YrqSpace/hugo-pic-bed@main/2026/10/2026-10-23-cover.jpg
 categories:
     - 随心记
 tags:

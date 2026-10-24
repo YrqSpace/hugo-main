@@ -1,6 +1,6 @@
 // 打字机 slogan
 (function () {
-    var el = document.querySelector('.profile-subtitle');
+    var el = document.querySelector('.profile-description');
     if (!el) return;
 
     // 要轮播的标语，可以自己增删修改

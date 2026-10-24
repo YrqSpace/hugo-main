@@ -9,7 +9,7 @@ links:
     description: 发现中文独立博客，订阅喜欢的作者
     website: https://bo.ke/
   - title: UpXuu's blog
-    description:  UpXuu，河北初中生/前端开发者/独立创作者。深耕 AI 逆向与开源折腾：自研 Extalk 评论系统、玩转 API 反代，顺带薅点 AI 的羊毛，偶尔写写生活随笔。逐光而上！
+    description:  UpXuu，河北初中生/前端开发者/独立创作者，逐光而上！
     website: https://upxuu.com
     image: https://avatars.githubusercontent.com/ImUpXuu
 menu:

@@ -9,9 +9,9 @@ links:
     description: 发现中文独立博客，订阅喜欢的作者
     website: https://bo.ke/
   - title: UpXuu's blog
-    description:  UpXuu，河北初中生/前端开发者/独立创作者，逐光而上！
+    description: 逐光而上！
     website: https://upxuu.com
-    image: https://avatars.githubusercontent.com/ImUpXuu
+    image: https://upxuu.com/images/me.jpg
 menu:
     main: 
         weight: -50

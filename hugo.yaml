@@ -152,17 +152,17 @@ params:
             host:
             id:
     widgets:
-        homepage:
+            homepage:
             - type: clock
             - type: search
             - type: archives
               params:
-                  limit: 5
+                limit: 5
             - type: categories
               params:
-                  limit: 10
-        page:
-            - type: toc
+                limit: 10
+            - type: custom
+
 
     opengraph:
         twitter:

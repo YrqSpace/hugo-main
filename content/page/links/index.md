@@ -25,8 +25,8 @@ comments: false
   <div class="fl-info" id="fl-info">
     <div class="fl-row"><span class="k">站点名称</span><span class="v">爱玩win11的me</span><button class="fl-cp" type="button">复制</button></div>
     <div class="fl-row"><span class="k">站点域名</span><span class="v">https://yrqspace.github.io</span><button class="fl-cp" type="button">复制</button></div>
-    <div class="fl-row"><span class="k">头像</span><span class="v">https://yrqspace.github.io/img/avatar.png</span><button class="fl-cp" type="button">复制</button></div>
-    <div class="fl-row"><span class="k">站点简介</span><span class="v">欢迎来到我的博客</span><button class="fl-cp" type="button">复制</button></div>
+    <div class="fl-row"><span class="k">头像</span><span class="v">https://yrqspace.github.io/favicon.ico</span><button class="fl-cp" type="button">复制</button></div>
+    <div class="fl-row"><span class="k">站点简介</span><span class="v"></span><button class="fl-cp" type="button">复制</button></div>
   </div>
   <button class="fl-all" id="fl-all" type="button">
     <svg viewBox="0 0 24 24"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h8"/></svg>

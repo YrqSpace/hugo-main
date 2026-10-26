@@ -505,23 +505,26 @@ if (!window.__pjaxPagefindFix) {
 <style>
   /* ===== 友链：搜索框 ===== */
   .friend-search-wrap {
-    margin: 1.4rem 0 0.6rem;
+    margin: 1.2rem 0 0.8rem;
     display: flex;
     flex-direction: column;
-    gap: 0.6rem;
+    align-items: flex-end;      /* 整体靠右 */
+    gap: 0.45rem;
   }
 
   .friend-search-box {
     position: relative;
     display: flex;
     align-items: center;
+    width: 100%;
+    max-width: 22rem;           /* 收窄：不再整行铺满 */
   }
 
   .friend-search-input {
     width: 100%;
     box-sizing: border-box;
-    padding: 0.7rem 2.6rem 0.7rem 2.4rem;
-    font-size: 1.4rem;
+    padding: 0.42rem 2rem 0.42rem 2.1rem;   /* 内边距缩小 */
+    font-size: 1.2rem;                       /* 字号缩小 */
     color: var(--card-text-color-main);
     background: var(--card-background);
     border: 1px solid var(--card-separator-color, rgba(128, 128, 128, 0.25));

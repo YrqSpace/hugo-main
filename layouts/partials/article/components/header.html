@@ -1,0 +1,90 @@
+{{ if .Params.links }}
+{{/* ============ 友链页专用：头部拆成左右两个框 ============ */}}
+<header class="article-header friend-header">
+
+    {{/* 左框：标题 + 阅读时长 + 协议许可 */}}
+    <div class="friend-box friend-box--info">
+        <div class="article-title-wrapper">
+            <h2 class="article-title">
+                <a href="{{ .RelPermalink }}">{{- .Title -}}</a>
+            </h2>
+            {{ with .Params.description }}
+                <h3 class="article-subtitle">{{ . }}</h3>
+            {{ end }}
+        </div>
+
+        {{ $showReadingTime := .Params.readingTime | default (.Site.Params.article.readingTime) }}
+        <footer class="article-time">
+            {{ if $showReadingTime }}
+                <div>
+                    {{ partial "helper/icon" "clock" }}
+                    <time class="article-time--reading">
+                        {{ T "article.readingTime" .ReadingTime }}
+                    </time>
+                </div>
+            {{ end }}
+        </footer>
+
+        {{ if and (.Site.Params.article.license.enabled) (not (eq .Params.license false)) }}
+        <section class="article-copyright">
+            {{ partial "helper/icon" "copyright" }}
+            <span>{{ default .Site.Params.article.license.default .Params.license | markdownify }}</span>
+        </section>
+        {{ end }}
+    </div>
+
+    {{/* 右框：交换须知 */}}
+    <div class="friend-box friend-box--notice">
+        <h3 class="friend-box__title">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 2 21h20L12 3z"/><path d="M12 10v4M12 17.5v.01"/></svg>
+            交换须知
+        </h3>
+        <p class="friend-lead">欢迎同人、技术、设计、ACG、自媒体等各类<b>健康有特色的独立博客</b>相互串链。先把本站加进你的友链，再来申请。</p>
+        <ul class="friend-req">
+            <li>全站 HTTPS</li>
+            <li>内容健康，无采集</li>
+            <li>半年内有更新</li>
+            <li>独立域名可访问</li>
+            <li>先加本站友链，再提交申请</li>
+        </ul>
+    </div>
+
+</header>
+{{ else }}
+{{/* ============ 其余文章：保持主题原样 ============ */}}
+<header class="article-header">
+    {{- $image := partialCached "helper/image" (dict "Context" . "Type" "article") .RelPermalink "article" -}}
+    {{ if $image.exists }}
+        <div class="article-image">
+            <a href="{{ .RelPermalink }}">
+                {{ if $image.resource }}
+                    {{- $Permalink := $image.resource.RelPermalink -}}
+                    {{- $Width := $image.resource.Width -}}
+                    {{- $Height := $image.resource.Height -}}
+                    {{- $Srcset := "" -}}
+
+                    {{- if (default true .Page.Site.Params.imageProcessing.cover.enabled) -}}
+                        {{- $thumbnail := $image.resource.Resize "800x" -}}
+                        {{- $thumbnailRetina := $image.resource.Resize "1600x" -}}
+                        {{- $Srcset = printf "%s 800w, %s 1600w" $thumbnail.RelPermalink $thumbnailRetina.RelPermalink -}}
+                        {{- $Permalink = $thumbnail.RelPermalink -}}
+                        {{- $Width = $thumbnail.Width -}}
+                        {{- $Height = $thumbnail.Height -}}
+                    {{- end -}}
+
+                    <img src="{{ $Permalink }}"
+                        {{ with $Srcset }}srcset="{{ . }}"{{ end }}
+                        width="{{ $Width }}"
+                        height="{{ $Height }}"
+                        loading="lazy"
+                        alt="Featured image of post {{ .Title }}" />
+                {{ else }}
+                    <img src="{{ $image.permalink }}" loading="lazy" alt="Featured image of post {{ .Title }}" />
+                {{ end }}
+            </a>
+        </div>
+    {{ end }}
+
+    {{ partialCached "article/components/details" . .RelPermalink }}
+</header>
+{{ end }}

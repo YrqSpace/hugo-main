@@ -20,3 +20,50 @@ menu:
 
 comments: false
 ---
+<div class="fl-card">
+  <div class="fl-hd"><i></i><h3>本站信息</h3><span>Copy &amp; paste</span></div>
+  <div class="fl-info" id="fl-info">
+    <div class="fl-row"><span class="k">站点名称</span><span class="v">爱玩win11的me</span><button class="fl-cp" type="button">复制</button></div>
+    <div class="fl-row"><span class="k">站点域名</span><span class="v">https://yrqspace.github.io</span><button class="fl-cp" type="button">复制</button></div>
+    <div class="fl-row"><span class="k">头像</span><span class="v">https://yrqspace.github.io/img/avatar.png</span><button class="fl-cp" type="button">复制</button></div>
+    <div class="fl-row"><span class="k">站点简介</span><span class="v">欢迎来到我的博客</span><button class="fl-cp" type="button">复制</button></div>
+  </div>
+  <button class="fl-all" id="fl-all" type="button">
+    <svg viewBox="0 0 24 24"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h8"/></svg>
+    一键复制本站信息 <kbd>YAML</kbd>
+  </button>
+</div>
+
+<script>
+(function(){
+  var box=document.getElementById('fl-info'); if(!box) return;
+  function clip(t){
+    if(navigator.clipboard&&window.isSecureContext) return navigator.clipboard.writeText(t);
+    var a=document.createElement('textarea'); a.value=t; a.style.position='fixed'; a.style.opacity='0';
+    document.body.appendChild(a); a.select();
+    try{document.execCommand('copy')}catch(e){}
+    document.body.removeChild(a); return Promise.resolve();
+  }
+  function flash(b,t){
+    if(!b.dataset.old) b.dataset.old=b.innerHTML;
+    b.innerHTML=t; b.classList.add('ok');
+    setTimeout(function(){b.innerHTML=b.dataset.old; b.classList.remove('ok')},1600);
+  }
+  var rows=box.querySelectorAll('.fl-row');
+  Array.prototype.forEach.call(rows,function(r){
+    var b=r.querySelector('.fl-cp'); if(!b) return;
+    b.addEventListener('click',function(){
+      clip(r.querySelector('.v').textContent.trim()).then(function(){flash(b,'已复制')});
+    });
+  });
+  var all=document.getElementById('fl-all');
+  all.addEventListener('click',function(){
+    var m={}; Array.prototype.forEach.call(rows,function(r){
+      m[r.querySelector('.k').textContent.trim()]=r.querySelector('.v').textContent.trim();
+    });
+    var NL=String.fromCharCode(10);
+    var md=['- name: '+m['站点名称'],'  url: '+m['站点域名'],'  avatar: '+m['头像'],'  desc: '+m['站点简介']].join(NL);
+    clip(md).then(function(){flash(all,'✔ 已复制，粘贴到对方的 links 配置里')});
+  });
+})();
+</script>

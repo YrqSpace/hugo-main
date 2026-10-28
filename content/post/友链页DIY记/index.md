@@ -2,6 +2,7 @@
 title: 友链页 DIY 记
 date: 2026-10-26T23:00:00+08:00
 slug: 友链页 DIY 记
+image: https://gcore.jsdelivr.net/gh/YrqSpace/hugo-pic-bed@main/2026/10/2026-10-28-cover.jpg
 categories:
     - 随心记
 ---

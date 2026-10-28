@@ -3,8 +3,6 @@ title: "给博客配了个状态页，结果它自己先挂了"
 description: "用 Upptime 搭了个 uptime 监控页，部署完打开却一直转圈，偶尔还弹 An error occurred。从官方 demo 正常到定位 GitHub API 限流，记录这次排错全过程。"
 date: 2026-10-25T13:00:00+08:00
 image: https://gcore.jsdelivr.net/gh/YrqSpace/hugo-pic-bed@main/2026/10/2026-10-25-cover.jpg
-categories:
-    - 随心记
 tags:
     - Upptime
     - GitHub Actions

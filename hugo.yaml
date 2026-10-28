@@ -13,6 +13,10 @@ DefaultContentLanguage: zh-cn
 # This will make .Summary and .WordCount behave correctly for CJK languages.
 hasCJKLanguage: true
 
+# 只保留标签，删除分类
+taxonomies:
+    tag: tags
+
 languages:
     zh-cn:
         languageName: 简体中文
@@ -158,9 +162,9 @@ params:
             - type: archives
               params:
                 limit: 5
-            - type: categories
+            - type: tag-cloud
               params:
-                limit: 10
+                limit: 30
             - type: custom
 
 
@@ -218,8 +222,6 @@ related:
         - name: tags
           weight: 100
 
-        - name: categories
-          weight: 200
 
 markup:
     goldmark:

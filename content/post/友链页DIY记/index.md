@@ -2,9 +2,11 @@
 title: 友链页 DIY 记
 date: 2026-10-26T23:00:00+08:00
 slug: 友链页 DIY 记
+tags:
+    - 友链
+    - 独立博客
+    - Hugo
 image: https://gcore.jsdelivr.net/gh/YrqSpace/hugo-pic-bed@main/2026/10/2026-10-28-cover.jpg
-categories:
-    - 随心记
 ---
 
 友链页是独立博客的脸面之一，但我一开始只有一张孤零零的 GitHub 卡片。这篇记录我怎么把它改造成一个「自助交换站」：交换须知、本站信息一键复制、友链随机排序、按名字搜索。

@@ -372,3 +372,37 @@
   .friend-req { grid-template-columns: 1fr; }
   .friend-req li:last-child { grid-column: auto; }
 }
+
+/* ============ 标签云：字号分级 + 紧凑胶囊 ============ */
+/* Stack 的 tag-cloud 组件输出 font_size_<count> 类，但主题未内置字号样式 */
+.tagCloud .tagCloud-tags {
+  gap: 7px;
+
+  a {
+    padding: 3px 11px;
+    line-height: 1.45;
+    font-weight: 400;
+  }
+
+  a.font_size_1  { font-size: 1.00rem; }
+  a.font_size_2  { font-size: 1.10rem; }
+  a.font_size_3  { font-size: 1.20rem; }
+  a.font_size_4  { font-size: 1.30rem; }
+  a.font_size_5  { font-size: 1.38rem; }
+  a.font_size_6  { font-size: 1.46rem; }
+  a.font_size_7  { font-size: 1.54rem; }
+  a.font_size_8  { font-size: 1.62rem; }
+  a.font_size_9  { font-size: 1.70rem; }
+  a.font_size_10 { font-size: 1.78rem; }
+
+  /* 高频标签仅加重颜色，不再放大字重 */
+  a.font_size_5,
+  a.font_size_6,
+  a.font_size_7,
+  a.font_size_8,
+  a.font_size_9,
+  a.font_size_10 {
+    font-weight: 600;
+    color: var(--accent-color);
+  }
+}

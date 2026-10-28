@@ -3,8 +3,6 @@ title: "Bing 收录成功记"
 description: "上一篇留了句狠话：等 Bing 来敲门就写《收录成功记》。门确实响了，但'已编制索引'和'能搜到'之间还隔着一层东西。"
 date: 2026-10-26T10:00:00+08:00
 image: https://gcore.jsdelivr.net/gh/YrqSpace/hugo-pic-bed@main/2026/10/2026-10-26-cover.jpg
-categories:
-    - 随心记
 tags:
     - Bing
     - IndexNow

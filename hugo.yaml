@@ -1,9 +1,9 @@
-baseurl: https://yrqspace.github.io/
+baseurl: https://tinkerlog.dpdns.org/
 languageCode: zh-cn
 theme: hugo-theme-stack
 paginate: 5
-title: 爱玩win11的me
-copyright: 爱玩win11的me
+title: Tinker Log
+copyright: Tinker Log
 
 # Theme i18n support
 # Available values: ar, bn, ca, de, el, en, es, fr, hu, id, it, ja, ko, nl, pt-br, th, uk, zh-cn, zh-hk, zh-tw
@@ -20,7 +20,7 @@ taxonomies:
 languages:
     zh-cn:
         languageName: 简体中文
-        title: 爱玩win11的me
+        title: Tinker Log
         weight: 2
         params:
             description: 记录折腾博客的日常
@@ -70,7 +70,7 @@ params:
             default: 根据 CC BY-NC-SA 4.0 协议许可
     comments:
         enabled: true
-        provider: waline
+        provider: giscus
 
         disqusjs:
             shortname:

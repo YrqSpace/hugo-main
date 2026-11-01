@@ -1,6 +1,6 @@
 ---
 title: 你好,世界
-date: 2024-11-13
+date: 2025-12-23
 slug: 你好,世界
 image: https://gcore.jsdelivr.net/gh/YrqSpace/hugo-pic-bed@main/2026/09/2026-09-18-cover.jpg
 tags:

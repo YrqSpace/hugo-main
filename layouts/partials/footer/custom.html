@@ -455,6 +455,32 @@ function closeCookieModal() {
 
 
 
+
+<script>
+/* 「详情」按钮：展开 / 收起完整 Cookie 条款 */
+(function () {
+    function initCookieMore() {
+        var more = document.getElementById('cookie-more');
+        var modal = document.getElementById('cookie-modal');
+        if (!more || !modal) return;
+        if (more.dataset.bound === '1') return;
+        more.dataset.bound = '1';
+        more.addEventListener('click', function (e) {
+            e.preventDefault();
+            var open = modal.classList.toggle('is-open');
+            more.textContent = open ? '收起' : '详情';
+            more.setAttribute('aria-expanded', open ? 'true' : 'false');
+        });
+    }
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initCookieMore);
+    } else {
+        initCookieMore();
+    }
+    document.addEventListener('pjax:complete', initCookieMore);
+})();
+</script>
+
 <script>
 if (!window.__pjaxPagefindFix) {
     window.__pjaxPagefindFix = true;

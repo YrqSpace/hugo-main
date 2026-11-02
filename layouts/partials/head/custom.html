@@ -340,3 +340,12 @@
 
     initLoading();
 </script>
+
+{{ if .IsHome }}
+  {{ $pages := where site.RegularPages "Type" "in" site.Params.mainSections }}
+  {{ with index $pages 0 }}
+    {{ with .Params.image }}
+      <link rel="preload" as="image" href="{{ . }}" fetchpriority="high">
+    {{ end }}
+  {{ end }}
+{{ end }}

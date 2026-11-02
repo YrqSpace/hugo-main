@@ -2,7 +2,7 @@
 title: "我的 Bing 收录折腾记"
 description: "新博客上线，等 Bing 收录等到怀疑人生。这篇记录我怎么从'已发现但未爬网'一路折腾到 IndexNow 自动提交的。"
 date: 2026-10-16T13:00:00+08:00
-image: https://gcore.jsdelivr.net/gh/YrqSpace/hugo-pic-bed@main/2026/10/2026-10-16-cover.jpg
+image: https://image.tinkerlog.dpdns.org/2026/10/2026-10-16-cover.jpg
 tags:
     - Bing
     - IndexNow

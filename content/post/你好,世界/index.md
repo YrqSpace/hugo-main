@@ -2,7 +2,7 @@
 title: 你好,世界
 date: 2025-12-23
 slug: 你好,世界
-image: https://gcore.jsdelivr.net/gh/YrqSpace/hugo-pic-bed@main/2026/09/2026-09-18-cover.jpg
+image: https://image.tinkerlog.dpdns.org/2026/09/2026-09-18-cover.jpg
 tags:
     - 建站
     - Hugo

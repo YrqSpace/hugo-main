@@ -2,7 +2,7 @@
 title: 免费云电脑获取与认证教程
 date: 2026-10-02
 slug: 免费云电脑教程
-image: https://gcore.jsdelivr.net/gh/YrqSpace/hugo-pic-bed@main/2026/10/2026-10-02-cover.jpg
+image: https://image.tinkerlog.dpdns.org/2026/10/2026-10-02-cover.jpg
 tags:
     - 薅羊毛
     - 云电脑
@@ -100,7 +100,7 @@ description: 在 hiltyun 公益专区做任务赚牛马币，购买免费云电�
 
 审核完成后，再次来到添加用户页面，你会看到：
 
-![](https://gcore.jsdelivr.net/gh/YrqSpace/hugo-pic-bed@main/2026/10/2026-10-02-1.jpg)
+![](https://image.tinkerlog.dpdns.org/2026/10/2026-10-02-1.jpg)
 
 到这一步就能正常添加用户、连上去用了。
 

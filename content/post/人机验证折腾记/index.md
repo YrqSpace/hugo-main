@@ -7,7 +7,7 @@ tags:
     - Turnstile
     - 人机验证
     - Hugo
-image: https://gcore.jsdelivr.net/gh/YrqSpace/hugo-pic-bed@main/2026/09/2026-09-25-cover.jpg
+image: https://image.tinkerlog.dpdns.org/2026/09/2026-09-25-cover.jpg
 ---
 
 折腾了整整两天，终于给我的博客加上了一道像样的人机验证。这篇把全过程记下来，也给想在 GitHub Pages 上加验证的朋友一条现成的路。

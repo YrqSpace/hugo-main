@@ -2,13 +2,17 @@
 title: 图床折腾记：封面搬出仓库，结果栽在 jsDelivr 缓存上
 date: 2026-10-29
 slug: 图床折腾记
-image: https://gcore.jsdelivr.net/gh/YrqSpace/hugo-pic-bed@main/2026/10/2026-10-29-cover.jpg
+image: https://image.tinkerlog.dpdns.org/2026/10/2026-10-29-cover.jpg
 description: 把封面从博客仓库搬到独立图床仓库，走 jsDelivr 加速，顺手记下缓存不刷新和节点不一致两个坑。
 tags:
     - 图床
     - jsDelivr
     - Hugo
 ---
+
+**2026-11 更新：** 本文的 jsDelivr 方案已不再使用。它的节点在国内时好时坏，缓存机制也不好控制，而且图片地址完全由第三方决定。
+
+现在改为自建子域名 `image.tinkerlog.dpdns.org`，用一个 Cloudflare Worker 反向代理 GitHub 仓库，域名、缓存策略、上游来源都在自己手上。文章的发布流程没有变化，只是链接前缀换了。
 
 ## 起因：几张大图把仓库拖进了泥潭
 
@@ -62,7 +66,7 @@ tags:
 图片传上去，链接拼出来是这种形式：
 
 ```
-https://gcore.jsdelivr.net/gh/YrqSpace/hugo-pic-bed@main/2026/09/2026-09-25-cover.jpg
+https://image.tinkerlog.dpdns.org/2026/09/2026-09-25-cover.jpg
 ```
 
 第一次访问，正常。然后我改了同一张图（重新生成了一版封面），覆盖提交，刷新页面——还是旧的那张。
@@ -96,7 +100,7 @@ https://purge.jsdelivr.net/gh/YrqSpace/hugo-pic-bed@main/2026/09/2026-09-25-cove
 这是整个流程里最容易被跳过、但也最该有的一步：**别靠眼睛看，靠响应头。**
 
 ```
-curl -I https://gcore.jsdelivr.net/gh/YrqSpace/hugo-pic-bed@main/2026/09/2026-09-25-cover.jpg
+curl -I https://image.tinkerlog.dpdns.org/2026/09/2026-09-25-cover.jpg
 ```
 
 看三样东西：状态码是不是 `200`，`content-length` 是不是和本地文件对得上，`age` 头是多少（缓存了多少秒）。内容长度对不上，八成就是读到旧缓存了。

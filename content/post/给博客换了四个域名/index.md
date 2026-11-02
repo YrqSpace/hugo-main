@@ -8,7 +8,7 @@ tags:
     - eTLD
     - Cloudflare
     - Hugo
-image: https://gcore.jsdelivr.net/gh/YrqSpace/hugo-pic-bed@main/2026/11/2026-11-02-cover.jpg
+image: https://image.tinkerlog.dpdns.org/2026/11/2026-11-02-cover.jpg
 ---
 
 `yrqspace.github.io` 这个地址我用了两年。能用，但不好看，而且每次跟人说起自己有个博客，都得先解释一遍这不是 GitHub 主页。

@@ -6,7 +6,7 @@ tags:
     - 友链
     - 独立博客
     - Hugo
-image: https://gcore.jsdelivr.net/gh/YrqSpace/hugo-pic-bed@main/2026/10/2026-10-28-cover.jpg
+image: https://image.tinkerlog.dpdns.org/2026/10/2026-10-28-cover.jpg
 ---
 
 友链页是独立博客的脸面之一，但我一开始只有一张孤零零的 GitHub 卡片。这篇记录我怎么把它改造成一个「自助交换站」：交换须知、本站信息一键复制、友链随机排序、按名字搜索。

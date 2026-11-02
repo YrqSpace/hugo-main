@@ -2,7 +2,7 @@
 title: "第一次给开源项目提 PR"
 description: "为了给博客攒一条外链，我人生中第一次给开源项目提了 PR。从 fork、改 CSV、投错仓库到 lint 通过，一路都是坑，也一路都在学。"
 date: 2026-10-22T13:00:00+08:00
-image: https://gcore.jsdelivr.net/gh/YrqSpace/hugo-pic-bed@main/2026/10/2026-10-22-cover.jpg
+image: https://image.tinkerlog.dpdns.org/2026/10/2026-10-22-cover.jpg
 tags:
     - GitHub
     - PR

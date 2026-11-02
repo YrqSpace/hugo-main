@@ -2,7 +2,7 @@
 title: 给 Hugo 博客装上 Pagefind 站内搜索，中文分词和样式都踩了一遍
 date: 2026-09-27
 slug: 站内搜索折腾记
-image: https://gcore.jsdelivr.net/gh/YrqSpace/hugo-pic-bed@main/2026/09/2026-09-27-cover.jpg
+image: https://image.tinkerlog.dpdns.org/2026/09/2026-09-27-cover.jpg
 tags:
     - Pagefind
     - 站内搜索

@@ -2,7 +2,7 @@
 title: Waline 评论系统折腾记：自托管、字体和 PJAX 的三重坑
 date: 2026-10-30
 slug: Waline评论系统折腾记
-image: https://gcore.jsdelivr.net/gh/YrqSpace/hugo-pic-bed@main/2026/10/2026-10-30-waline-cover.jpg
+image: https://image.tinkerlog.dpdns.org/2026/10/2026-10-30-waline-cover.jpg
 description: 把评论从 Giscus 换成 Waline，服务端跑在 Vercel 上。真正花时间的不是部署，而是自托管客户端、10px 的评论字号，以及 PJAX 换页后评论框集体失联。
 tags:
     - Waline

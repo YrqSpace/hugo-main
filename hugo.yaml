@@ -46,7 +46,7 @@ params:
     # e.g.: favicon placed in `static/favicon.ico` of your site folder, then set this field to `/favicon.ico` (`/` is necessary)
 
     footer:
-        since: 2024
+        since: 2025
         customText:
 
     dateFormat:

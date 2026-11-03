@@ -1,6 +1,7 @@
 ---
 title: 把“图床”换成“图片服务”
 date: 2026-11-03 12:50:29
+slug: 把图床换成图片服务
 tags:
     - 图床
     - Cloudflare Workers

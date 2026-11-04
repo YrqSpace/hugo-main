@@ -1,0 +1,351 @@
+<!-- Cloudflare Turnstile（人机验证）：显式渲染，稍后由脚本调用 -->
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" async defer></script>
+<script>
+    (function () {
+        // 与右下角欢迎语一致：同一标签页会话（sessionStorage）内只验证一次
+        var KEY = 'turnstile-passed';
+        var passed = false;
+        try { passed = sessionStorage.getItem(KEY) === '1'; } catch (e) { passed = false; }
+        // 挂到 window，供主流程判断是否跳过加载与人机验证
+        window.__turnstilePassed = passed;
+        if (passed) {
+            // 已验证：标记 class，CSS 直接隐藏加载遮罩，避免闪烁
+            document.documentElement.classList.add('turnstile-passed');
+        } else {
+            document.documentElement.classList.add('is-loading');
+        }
+    })();
+</script>
+<div class="loading">
+    <div class="spinner">
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+    </div>
+    <div class="captcha-prepare" id="captchaPrepare">正在准备人机验证...</div>
+    <div class="captcha-box" id="captchaBox"></div>
+    <div class="captcha-after" id="captchaAfter">请稍后,正在请求blog-turnstile接口</div>
+</div>
+
+<style>
+    .loading {
+        position: fixed;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 99;
+        /* 跟随主题变量（hugo-theme-stack 的 --body-background），自带亮色兜底 */
+        background-color: var(--body-background, #f5f5fa);
+        /* 渐隐淡出动画 */
+        transition: opacity 0.1s ease;
+    }
+
+    /* 淡出状态：遮罩渐隐 */
+    .loading.is-hidden {
+        opacity: 0;
+        pointer-events: none;
+    }
+
+    /* 本会话已验证（与欢迎语一致）：直接不显示加载遮罩 */
+    html.turnstile-passed .loading {
+        display: none !important;
+    }
+
+    /* 明暗模式兜底（当主题变量不可用时也能正确配色） */
+    html[data-scheme="light"] .loading {
+        background-color: #f5f5fa;
+    }
+    html[data-scheme="dark"] .loading {
+        background-color: #303030;
+    }
+    @media (prefers-color-scheme: dark) {
+        .loading {
+            background-color: #303030;
+        }
+    }
+
+    /*
+     * 加载页期间隐藏音乐播放器：
+     * 播放器照常在后台初始化/预加载，只是不显示、不拦截点击。
+     * 加载页结束后移除 html.is-loading，播放器淡入出现。
+     */
+    html.is-loading .aplayer {
+        opacity: 0 !important;
+        visibility: hidden !important;
+        pointer-events: none !important;
+    }
+    /* 播放器出现时的过渡 */
+    .aplayer {
+        transition: opacity 0.4s ease;
+    }
+
+    .spinner {
+        --gap: 5px;
+        --clr: #3b82f6;   /* 原版是 #d62d20 红色，这里换成蓝色 */
+        --height: 23px;
+        width: 100px;
+        height: 100px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: var(--gap);
+        transition: opacity 0.35s ease;
+    }
+    /* 四根柱子消失 */
+    .spinner.is-hidden {
+        opacity: 0;
+    }
+
+    .spinner span {
+        background: var(--clr);
+        width: 6px;
+        height: var(--height);
+        animation: grow 1s ease-in-out infinite;
+    }
+    .spinner span:nth-child(2) { animation: grow 1s ease-in-out 0.15s infinite; }
+    .spinner span:nth-child(3) { animation: grow 1s ease-in-out 0.3s infinite; }
+    .spinner span:nth-child(4) { animation: grow 1s ease-in-out 0.475s infinite; }
+
+    @keyframes grow {
+        0%, 100% { transform: scaleY(1); }
+        50% { transform: scaleY(1.8); }
+    }
+
+    /* “正在准备人机验证...” 文案 */
+    .captcha-prepare {
+        display: none;
+        margin-top: 6px;
+        font-size: 14px;
+        letter-spacing: 1px;
+        color: var(--body-text-color, #555);
+    }
+    .captcha-prepare.is-show {
+        display: block;
+        animation: captchaSlideIn 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+    }
+
+    /* Turnstile 组件容器 */
+    .captcha-box {
+        display: none;
+        margin-top: 6px;
+        min-height: 65px;
+    }
+    .captcha-box.is-show {
+        display: block;
+        animation: captchaSlideIn 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+    }
+
+    /* 验证通过后、“请稍后...” 文案（放行前的过渡提示） */
+    .captcha-after {
+        display: none;
+        margin-top: 6px;
+        font-size: 14px;
+        letter-spacing: 1px;
+        color: var(--body-text-color, #555);
+    }
+    .captcha-after.is-show {
+        display: block;
+        animation: captchaSlideIn 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+    }
+
+    /* 与右下角欢迎语一致的滑入动画：从右侧滑入 + 同款缓动曲线 */
+    @keyframes captchaSlideIn {
+        from { opacity: 0; transform: translateX(60px); }
+        to { opacity: 1; transform: translateX(0); }
+    }
+</style>
+
+<script>
+    function initLoading() {
+        var loading = document.querySelector(".loading");
+        var hidden = false;
+        var captchaStarted = false;
+
+        // 本会话已验证过（与欢迎语一致）：跳过加载动画与人机验证，直接放行
+        if (window.__turnstilePassed) {
+            if (loading) {
+                loading.style.display = "none";
+            }
+            document.documentElement.classList.remove("is-loading");
+            return;
+        }
+
+        // 触发淡出并移除加载遮罩（仅在通过人机验证后调用）
+        function hideLoading() {
+            if (!loading || hidden) {
+                return;
+            }
+            hidden = true;
+            // 先触发渐隐动画（0.1s 内慢慢淡出）
+            loading.classList.add("is-hidden");
+            // 渐隐结束后再彻底移除，避免遮挡页面点击
+            setTimeout(function () {
+                loading.style.display = "none";
+                // 加载页结束，显示音乐播放器
+                document.documentElement.classList.remove("is-loading");
+            }, 500);
+        }
+
+        // 资源就绪后进入人机验证流程：
+        // 四根柱子消失 -> 显示“正在准备人机验证...” -> 0.5 秒后弹出 Turnstile -> 验证通过才放行
+        function startCaptcha() {
+            if (captchaStarted) {
+                return;
+            }
+            captchaStarted = true;
+
+            var spinner = document.querySelector(".loading .spinner");
+            var prepare = document.getElementById("captchaPrepare");
+            var box = document.getElementById("captchaBox");
+
+            // 1) 四根柱子消失
+            if (spinner) {
+                spinner.classList.add("is-hidden");
+            }
+            // 2) 显示“正在准备人机验证...”
+            if (prepare) {
+                prepare.classList.add("is-show");
+            }
+
+            // 3) 等 0.5 秒弹出验证
+            setTimeout(function () {
+                if (prepare) {
+                    prepare.classList.remove("is-show");
+                }
+                if (box) {
+                    box.classList.add("is-show");
+                }
+                renderTurnstile(box);
+            }, 500);
+        }
+
+        // 等 Turnstile 脚本就绪后渲染组件
+        function renderTurnstile(box) {
+            if (!box) {
+                return;
+            }
+            var waited = 0;
+            var timer = setInterval(function () {
+                if (window.turnstile && typeof window.turnstile.render === "function") {
+                    clearInterval(timer);
+                    doRender(box);
+                } else if (waited >= 8000) {
+                    clearInterval(timer);
+                    box.innerHTML = '<p style="margin:0 0 12px;font-size:13px;text-align:center;">验证组件加载失败，请检查网络后重试</p>';
+                    var btn = document.createElement("button");
+                    btn.textContent = "重新加载";
+                    btn.style.cssText = "display:block;margin:0 auto;padding:8px 18px;border:0;border-radius:8px;background:var(--accent-color,#3b82f6);color:#fff;cursor:pointer;";
+                    btn.onclick = function () {
+                        location.reload();
+                    };
+                    box.appendChild(btn);
+                }
+                waited += 200;
+            }, 200);
+        }
+
+        function doRender(box) {
+            var scheme = document.documentElement.getAttribute("data-scheme");
+            var theme = scheme === "dark" ? "dark" : (scheme === "light" ? "light" : "auto");
+            try {
+                window.turnstile.render(box, {
+                    sitekey: "0x4AAAAAAFMoHgJeuUgOvCLv",
+                    theme: theme,
+                    callback: function () {
+                        // 验证通过：记录本会话已通过（与欢迎语一致，同一标签页只验证一次）
+                        try { sessionStorage.setItem("turnstile-passed", "1"); } catch (e) {}
+                        // 先收起验证框，显示“请稍后...”，稍作停顿后再放行访问
+                        var prepare = document.getElementById("captchaPrepare");
+                        var after = document.getElementById("captchaAfter");
+                        if (box) { box.classList.remove("is-show"); }
+                        if (prepare) { prepare.classList.remove("is-show"); }
+                        if (after) { after.classList.add("is-show"); }
+                        setTimeout(hideLoading, 800);
+                    }
+                });
+            } catch (e) {
+                box.innerHTML = '<p style="margin:0;font-size:13px;text-align:center;">验证初始化失败，请刷新页面重试</p>';
+            }
+        }
+
+        // 判断图片是否加载完成（含缓存命中 / 加载失败），完成后回调
+        function whenImageReady(img, callback) {
+            if (!img) {
+                callback();
+                return;
+            }
+            // 强制立即加载，避免 loading="lazy" 导致 load 事件迟迟不触发
+            try { img.loading = "eager"; } catch (e) {}
+            if (img.complete && img.naturalWidth !== 0) {
+                callback();
+                return;
+            }
+            img.addEventListener("load", callback, { once: true });
+            img.addEventListener("error", callback, { once: true });
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            // 1) 头像
+            var avatar = document.querySelector(".site-avatar img, img.site-logo");
+
+            // 2) 文章：所需加载数量 = 文章总数的一半（单数取半加 1，即向上取整）
+            var articles = document.querySelectorAll(".article-list > article, .article-list .article-item");
+            var total = articles.length;
+            var need = Math.ceil(total / 2);
+
+            var avatarDone = false;
+            var articleDone = 0;
+            var startScheduled = false;
+
+            function maybeStart() {
+                if (avatarDone && articleDone >= need && !startScheduled) {
+                    startScheduled = true;
+                    // 加载条件满足后，再等待 1 秒动画时间，然后进入人机验证
+                    setTimeout(startCaptcha, 1000);
+                }
+            }
+
+            // 头像加载完成
+            whenImageReady(avatar, function () {
+                avatarDone = true;
+                maybeStart();
+            });
+
+            if (need === 0) {
+                maybeStart();
+            } else {
+                var counted = 0;
+                Array.prototype.forEach.call(articles, function (article) {
+                    if (counted >= need) {
+                        return;
+                    }
+                    counted++;
+                    whenImageReady(article.querySelector("img"), function () {
+                        articleDone++;
+                        maybeStart();
+                    });
+                });
+            }
+
+            // 兜底：最多等待 15 秒，避免个别资源异常导致加载页不消失（也直接进入人机验证）
+            setTimeout(startCaptcha, 15000);
+        });
+    }
+
+    initLoading();
+</script>
+
+{{ if .IsHome }}
+  {{ $pages := where site.RegularPages "Type" "in" site.Params.mainSections }}
+  {{ with index $pages 0 }}
+    {{ with .Params.image }}
+      <link rel="preload" as="image" href="{{ . }}" fetchpriority="high">
+    {{ end }}
+  {{ end }}
+{{ end }}

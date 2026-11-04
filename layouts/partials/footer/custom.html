@@ -437,18 +437,9 @@ function closeCookieModal() {
         m.classList.add('is-show');
         if (b) b.classList.add('is-show');
     }
-    function isPassed() {
-        try { return sessionStorage.getItem('turnstile-passed') === '1'; } catch (e) { return false; }
-    }
-    var timer = setInterval(function () {
-        if (isPassed()) {
-            clearInterval(timer);
-            setTimeout(showModal, 800);
-        }
-    }, 300);
-    if (window.__turnstilePassed || document.documentElement.classList.contains('turnstile-passed')) {
-        setTimeout(showModal, 500);
-    }
+    // 人机验证已移除：原先这里要等验证标记写入后才弹，否则 Cookie 提示永不出现。
+    // 现在直接按原延迟弹出，合规提示不丢失。
+    setTimeout(showModal, 500);
 })();
 </script>
 

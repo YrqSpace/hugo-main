@@ -1,0 +1,802 @@
+{{ partial "footer/welcome.html" . }}
+{{ partial "footer/aplayer.html" . }}
+{{ partial "footer/pjax.html" . }}
+
+
+<style>
+    /* 显示完整文章目录（包含子级标题，不再折叠隐藏） */
+    #TableOfContents ul,
+    #TableOfContents ol {
+        display: block;
+    }
+</style>
+
+<script>
+    function initTocHide() {
+        // 判断是否存在文章目录
+        let toc = document.querySelector(".widget--toc");
+        if (!toc) {
+            return;
+        }
+        // 监听滚动
+        window.addEventListener('scroll', function() {
+            //清除class值
+            let openUl = document.querySelectorAll(".open");
+            if (openUl.length > 0) {
+              openUl.forEach((ul) => {
+                ul.classList.remove("open")
+              })
+            }
+            // 获取active-class
+            let currentLi = document.querySelector(".active-class");
+            if (!currentLi) {
+                return
+            }
+            // 展示子ul
+            if (currentLi.children.length > 1) {
+                currentLi.children[1].classList.add("open")
+            }
+            // 展示父ul
+            let ul = currentLi.parentElement;
+            do {
+                ul.classList.add("open");
+                ul = ul.parentElement.parentElement
+            } while (ul !== undefined && (ul.localName === 'ul' || ul.localName === 'ol'))
+        });
+    }
+    initTocHide()
+</script>
+
+
+
+<style>
+    #backTopBtn {
+        display: none;
+        position: fixed;
+        bottom: 30px;
+        z-index: 99;
+        cursor: pointer;
+        width: 30px;
+        height: 30px;
+        background-image: url({{ (resources.Get "icons/backTop.svg").Permalink }});
+    }
+</style>
+
+<script>
+    /**
+     * 滚动回顶部初始化
+     */
+    function initScrollTop() {
+        // 恢复到原来的位置：优先挂回右侧边栏 .right-sidebar（与最初一致）
+        let rightSideBar = document.querySelector(".right-sidebar");
+        // PJAX 切换后 .right-sidebar 会被整体替换，先移除可能残留的旧按钮，避免重复
+        document.querySelectorAll("#backTopBtn").forEach(function (el) { el.remove(); });
+        let btn = document.createElement("div");
+        btn.id = "backTopBtn";
+        btn.onclick = backToTop;
+        if (rightSideBar) {
+            rightSideBar.appendChild(btn);
+        } else {
+            // 极少数没有右侧边栏的页面，兜底挂到 body 并靠右固定，保证按钮仍可用
+            btn.style.right = "30px";
+            document.body.appendChild(btn);
+        }
+        // 根据当前滚动位置更新按钮显隐
+        function updateBackTop() {
+            // 当网页向下滑动 20px 出现"返回顶部" 按钮
+            if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
+                btn.style.display = "block";
+            } else {
+                btn.style.display = "none";
+            }
+        }
+        // 用 addEventListener 绑定，先移除旧的再绑定，避免 PJAX 多次初始化后重复触发或丢监听
+        window.removeEventListener("scroll", window.__backTopScroll);
+        window.__backTopScroll = updateBackTop;
+        window.addEventListener("scroll", window.__backTopScroll);
+        updateBackTop();
+    }
+
+    /**
+     * 返回顶部
+     */
+    function backToTop(){
+        window.scrollTo({ top: 0, behavior: "smooth" })
+    }
+
+    initScrollTop();
+</script>
+
+<!-- 动态点线背景 particles.js（悬停吸附 grab） -->
+<div id="particles-js"></div>
+
+<script src={{ (resources.Get "background/particles.min.js" | fingerprint).RelPermalink }}></script>
+<script>
+    particlesJS.load('particles-js', {{ (resources.Get "background/particlesjs-config.json" | fingerprint).RelPermalink }}, function() {
+        console.log('particles.js loaded - callback');
+    });
+</script>
+
+<style>
+    #particles-js {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: -1;
+        pointer-events: none;
+    }
+</style>
+
+<!-- 底部小鱼游动特效 -->
+<script src={{ (resources.Get "background/fish.js" | fingerprint).RelPermalink }}></script>
+
+<!-- 中国传统节日 + 常用节日彩蛋（按公历/农历日期自动触发；预览：?fx=1 或 ?fx=节日key） -->
+<script src={{ (resources.Get "js/holiday-eggs.js" | fingerprint).RelPermalink }}></script>
+
+
+<!-- 浏览量 / 站点访问统计已全部移除（原先使用 vercount，如需恢复可再加回） -->
+
+<!--
+  Pagefind 搜索引导（全局）：
+  放在 footer/custom.html（.main-container 之外，PJAX 不会替换），
+  这样整页加载与 PJAX 无刷新跳转到搜索页都能生效。
+  修复两个问题：
+   1) 无刷新进入搜索页时 head 不换 → 样式丢失（白框）；这里改为动态注入 CSS。
+   2) pagefind-ui.js 异步加载竞态 → 偶发“索引没配置”；这里加入轮询重试。
+-->
+<script>
+(function () {
+    var PF_CSS = '/pagefind/pagefind-ui.css';
+    var PF_JS = '/pagefind/pagefind-ui.js';
+    var TRANSLATIONS = {
+        placeholder: "搜索文章…",
+        clear_search: "清空",
+        load_more: "加载更多结果",
+        search_label: "搜索本站",
+        filters_label: "筛选",
+        zero_results: "没有找到与 “[SEARCH_TERM]” 相关的内容",
+        many_results: "找到 [COUNT] 条与 “[SEARCH_TERM]” 相关的结果",
+        one_result: "找到 1 条与 “[SEARCH_TERM]” 相关的结果",
+        alt_search: "未找到 “[SEARCH_TERM]”，改为显示 “[DIFFERENT_TERM]” 的结果",
+        search_suggestion: "未找到 “[SEARCH_TERM]”，请尝试以下关键词之一：",
+        searching: "搜索中…"
+    };
+
+    function ensureCss() {
+        if (document.querySelector('link[href="' + PF_CSS + '"]')) return;
+        var l = document.createElement('link');
+        l.rel = 'stylesheet';
+        l.href = PF_CSS;
+        document.head.appendChild(l);
+    }
+
+    function whenReady(cb) {
+        if (typeof window.PagefindUI !== 'undefined') { cb(true); return; }
+        // 已有在加载中的脚本 → 轮询等待
+        var tries = 0;
+        (function loop() {
+            if (typeof window.PagefindUI !== 'undefined') { cb(true); return; }
+            if (tries++ > 100) { cb(false); return; } // 最多等 ~10s
+            setTimeout(loop, 100);
+        })();
+    }
+
+    function ensureScript(cb) {
+        if (typeof window.PagefindUI !== 'undefined') { cb(true); return; }
+        if (!document.querySelector('script[data-pf-ui]')) {
+            var s = document.createElement('script');
+            s.src = PF_JS;
+            s.setAttribute('data-pf-ui', '1');
+            s.onload = function () { whenReady(cb); };
+            s.onerror = function () { cb(false); };
+            document.head.appendChild(s);
+            return;
+        }
+        whenReady(cb);
+    }
+
+    function getTerm() {
+        try {
+            var p = new URLSearchParams(window.location.search);
+            return p.get('keyword') || p.get('q') || '';
+        } catch (e) { return ''; }
+    }
+
+    function mount() {
+        var el = document.getElementById('search');
+        if (!el) return; // 当前不在搜索页
+
+        ensureCss();     // 确保样式存在（PJAX 进入时 head 不换，需要补注入）
+
+        ensureScript(function (ok) {
+            var box = document.getElementById('search');
+            if (!box) return;
+            var hint = document.getElementById('pf-hint');
+
+            if (!ok || typeof window.PagefindUI === 'undefined') {
+                if (hint) {
+                    hint.style.display = 'block';
+                    hint.textContent = '对不起，搜索资源加载失败，请刷新页面重试。';
+                }
+                return;
+            }
+
+            if (box.dataset.pfMounted !== '1') {
+                box.innerHTML = '';
+                new window.PagefindUI({
+                    element: "#search",
+                    showSubResults: true,
+                    showImages: false,
+                    resetStyles: false,
+                    translations: TRANSLATIONS
+                });
+                box.dataset.pfMounted = '1';
+            }
+            if (hint) hint.style.display = 'none';
+
+            // 自动填入从首页/侧栏带过来的关键词并触发搜索
+            var term = getTerm();
+            if (term) {
+                var input = box.querySelector('.pagefind-ui__search-input');
+                if (input && input.value !== term) {
+                    input.value = term;
+                    input.dispatchEvent(new Event('input', { bubbles: true }));
+                    try { input.focus(); } catch (e) {}
+                }
+            }
+        });
+    }
+
+    window.__pfEnsure = mount;
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', function () { setTimeout(mount, 0); });
+    } else {
+        setTimeout(mount, 0);
+    }
+    // PJAX 无刷新跳转到/离开搜索页后重新处理
+    document.addEventListener('pjax:complete', function () { setTimeout(mount, 0); });
+})();
+</script>
+
+<!--
+  图片 Alt 属性自动补全 —— 修复 Bing 报送的「缺少图像的 Alt 属性」
+  ------------------------------------------------------------------
+  只在图片「完全没有 alt 属性」时补上有意义的描述，纯增量补全，
+  不改动主题模板与样式，不破坏点击 / 图片画廊（photoswipe）逻辑。
+  兼容 PJAX 无刷新跳转、懒加载与延迟渲染。
+  命名策略（按优先级）：
+    1. 图片自带 data-key（分类名 / 缓存键）
+    2. 分类/标签卡片 → 术语名（如「随心记」），其次描述
+    3. 文章卡片 / 文章页 → 文章标题
+    4. 文件名兜底；纯数字名则用「页面标题 + 配图」
+-->
+<script>
+(function () {
+    function buildAlt(img) {
+        if (img.getAttribute('alt') !== null && img.getAttribute('alt').trim() !== '') return null;
+
+        if (img.dataset && img.dataset.key && img.dataset.key.trim()) return img.dataset.key.trim();
+
+        var sec = img.closest('.section-card');
+        if (sec) {
+            var term = sec.querySelector('.section-term');
+            if (term && term.textContent.trim()) return term.textContent.trim();
+            var desc = sec.querySelector('.section-description');
+            if (desc && desc.textContent.trim()) return desc.textContent.trim();
+            var h = sec.querySelector('h1, h2');
+            if (h && h.textContent.trim()) return h.textContent.trim();
+        }
+
+        var art = img.closest('article') || img.closest('.article-details');
+        if (art) {
+            var t = art.querySelector('.article-title');
+            if (t && t.textContent.trim()) return t.textContent.trim();
+        }
+
+        var src = img.getAttribute('src') || '';
+        var base = decodeURIComponent(src.split('/').pop().split('?')[0]).replace(/\.[a-z0-9]+$/i, '');
+        base = base.replace(/[-_]+/g, ' ').replace(/\s+/g, ' ').trim();
+        var pt = document.querySelector('.article-title, h1');
+        var pageTitle = pt ? pt.textContent.trim() : '';
+        if (base && !/^[\d\s]+$/.test(base)) return base;
+        return (pageTitle ? pageTitle + ' ' : '') + '配图';
+    }
+
+    function runAltFix() {
+        var imgs = document.querySelectorAll('img:not([alt])');
+        Array.prototype.forEach.call(imgs, function (img) {
+            var a = buildAlt(img);
+            if (a) img.setAttribute('alt', a);
+        });
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', runAltFix);
+    } else {
+        runAltFix();
+    }
+    ['pjax:complete', 'pjax:end', 'pjax:success'].forEach(function (e) {
+        document.addEventListener(e, runAltFix);
+    });
+    window.addEventListener('load', runAltFix);
+    setTimeout(runAltFix, 1500);
+    setTimeout(runAltFix, 3000);
+})();
+</script>
+
+
+
+<style>
+/* 底部 Cookie 通知条：不再全屏遮挡正文 */
+#cookie-modal-backdrop{display:none !important;}
+
+#cookie-modal{
+    position:fixed;left:50%;bottom:16px;
+    transform:translate(-50%,150%);
+    width:calc(100% - 32px);max-width:720px;
+    background:var(--card-background);
+    border:1px solid var(--card-separator-color);
+    border-radius:14px;
+    box-shadow:0 8px 28px rgba(0,0,0,.18);
+    z-index:9998;
+    padding:14px 18px;
+    display:flex;flex-wrap:wrap;align-items:center;gap:12px;
+    opacity:0;visibility:hidden;
+    transition:transform .35s cubic-bezier(.22,1,.36,1),opacity .3s ease,visibility .3s ease;
+}
+#cookie-modal.is-show{transform:translate(-50%,0);opacity:1;visibility:visible;}
+#cookie-modal.is-hide{transform:translate(-50%,150%);opacity:0;visibility:hidden;}
+
+#cookie-modal .cookie-head{display:none;}
+
+#cookie-modal .cookie-summary{
+    flex:1 1 240px;min-width:0;
+    font-size:13px;line-height:1.7;
+    color:var(--card-text-color-main);
+}
+
+#cookie-modal .cookie-body{
+    flex:1 1 100%;order:3;
+    max-height:0;overflow:hidden;
+    margin-top:0;
+    padding:0;
+    font-size:13px;line-height:1.75;
+    color:var(--card-text-color-secondary);
+    transition:max-height .35s ease,margin-top .35s ease;
+}
+#cookie-modal.is-open .cookie-body{
+    max-height:40vh;overflow-y:auto;
+    margin-top:4px;padding-top:10px;
+    border-top:1px solid var(--card-separator-color);
+}
+
+#cookie-modal .cookie-foot{
+    flex:0 0 auto;margin-left:auto;
+    display:flex;gap:10px;align-items:center;
+}
+
+#cookie-modal .btn{
+    background:#3b82f6;color:#fff;border:0;border-radius:8px;
+    padding:7px 20px;cursor:pointer;font-size:13px;white-space:nowrap;
+}
+#cookie-modal .btn--ghost{
+    background:transparent;color:var(--card-text-color-secondary);
+    border:1px solid var(--card-separator-color);
+}
+#cookie-modal .btn--ghost:hover{color:var(--card-text-color-main);}
+
+@media (max-width:520px){
+    #cookie-modal{bottom:0;left:0;width:100%;max-width:none;
+        border-radius:14px 14px 0 0;transform:translate(0,150%);}
+    #cookie-modal.is-show{transform:translate(0,0);}
+    #cookie-modal.is-hide{transform:translate(0,150%);}
+    #cookie-modal .cookie-foot{flex:1 1 100%;justify-content:flex-end;}
+}
+
+</style>
+
+<div id="cookie-modal" role="dialog" aria-live="polite" aria-label="Cookie 使用提示">
+    <div class="cookie-summary">
+        本站使用少量 Cookie 与浏览器本地存储，仅用于主题记忆等站内功能，不用于广告追踪。
+    </div>
+    <div class="cookie-body">
+        <p>您好，感谢您访问本站！为了提供更便捷的体验，如记住您的主题偏好、播放进度等功能，本站会使用少量 Cookie 及浏览器本地存储。这些数据仅用于站内功能正常运行，不会被用于广告追踪，也不会出售给任何第三方。</p>
+        <p>您可以随时在浏览器设置中管理或禁用 Cookies，具体操作方法可参考浏览器的帮助文档。我们尊重您的选择，并承诺保护您的隐私。</p>
+        <p><strong>关于第三方服务：</strong></p>
+        <p>本站使用 Cloudflare、CDN 服务、以及 Giscus 评论系统。这些服务可能会设置必要的技术性 Cookie，以保障验证与评论功能正常。它们的使用受其自身隐私政策的约束。</p>
+        <p>如果您同意我们使用 Cookie，即可正常使用本站各项功能。如果您选择禁用 Cookies，部分功能(如评论、主题记忆)可能无法使用，但浏览文章不受影响。</p>
+        <p>我们承诺严格遵循隐私政策处理所有 Cookie 信息，确保您的个人信息安全。</p>
+    </div>
+    <div class="cookie-foot">
+        <button type="button" class="btn btn--ghost" id="cookie-more">详情</button>
+        <button type="button" class="btn" onclick="closeCookieModal()">可以</button>
+    </div>
+</div>
+
+<script>
+function closeCookieModal() {
+    var m = document.getElementById('cookie-modal');
+    var b = document.getElementById('cookie-modal-backdrop');
+    if (!m) return;
+    localStorage.setItem('cookie-ok', '1');
+    m.classList.add('is-hide');
+    if (b) b.classList.remove('is-show');
+    setTimeout(function () {
+        m.classList.remove('is-show', 'is-hide');
+    }, 320);
+}
+(function () {
+    function showModal() {
+        var m = document.getElementById('cookie-modal');
+        var b = document.getElementById('cookie-modal-backdrop');
+        if (!m) return;
+        if (localStorage.getItem('cookie-ok')) return;
+        m.classList.add('is-show');
+        if (b) b.classList.add('is-show');
+    }
+    function isPassed() {
+        try { return sessionStorage.getItem('turnstile-passed') === '1'; } catch (e) { return false; }
+    }
+    var timer = setInterval(function () {
+        if (isPassed()) {
+            clearInterval(timer);
+            setTimeout(showModal, 800);
+        }
+    }, 300);
+    if (window.__turnstilePassed || document.documentElement.classList.contains('turnstile-passed')) {
+        setTimeout(showModal, 500);
+    }
+})();
+</script>
+
+
+
+
+
+<script>
+/* 「详情」按钮：展开 / 收起完整 Cookie 条款 */
+(function () {
+    function initCookieMore() {
+        var more = document.getElementById('cookie-more');
+        var modal = document.getElementById('cookie-modal');
+        if (!more || !modal) return;
+        if (more.dataset.bound === '1') return;
+        more.dataset.bound = '1';
+        more.addEventListener('click', function (e) {
+            e.preventDefault();
+            var open = modal.classList.toggle('is-open');
+            more.textContent = open ? '收起' : '详情';
+            more.setAttribute('aria-expanded', open ? 'true' : 'false');
+        });
+    }
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initCookieMore);
+    } else {
+        initCookieMore();
+    }
+    document.addEventListener('pjax:complete', initCookieMore);
+})();
+</script>
+
+<script>
+if (!window.__pjaxPagefindFix) {
+    window.__pjaxPagefindFix = true;
+    document.addEventListener('click', function (e) {
+        var link = e.target && e.target.closest ? e.target.closest('a[href]') : null;
+        if (!link || !window.pjax) return;
+        if (!link.closest('.pagefind-ui')) return;
+        if (link.target === '_blank' || link.getAttribute('rel') === 'external') return;
+        var url = link.getAttribute('href');
+        if (!url || url.charAt(0) === '#') return;
+        e.preventDefault();
+        if (typeof window.pjax.loadUrl === 'function') {
+            window.pjax.loadUrl(link.href);
+        } else {
+            location.href = link.href;
+        }
+    }, true);
+}
+</script>
+
+
+
+<style>
+    .highlight {
+        /* 你可以根据需要调整这个高度 */
+        max-height: 400px;
+        overflow: hidden;
+    }
+
+    .code-show {
+        max-height: none !important;
+    }
+
+    .code-more-box {
+        width: 100%;
+        padding-top: 78px;
+        background-image: -webkit-gradient(linear, left top, left bottom, from(rgba(255, 255, 255, 0)), to(#fff));
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 1;
+    }
+
+    .code-more-btn {
+        display: block;
+        margin: auto;
+        width: 44px;
+        height: 22px;
+        background: #f0f0f5;
+        border-top-left-radius: 8px;
+        border-top-right-radius: 8px;
+        padding-top: 6px;
+        cursor: pointer;
+    }
+
+    .code-more-img {
+        cursor: pointer !important;
+        display: block;
+        margin: auto;
+        width: 22px;
+        height: 16px;
+    }
+</style>
+
+<script>
+  function initCodeMoreBox() {
+    let codeBlocks = document.querySelectorAll(".highlight");
+    if (!codeBlocks) {
+      return;
+    }
+    codeBlocks.forEach(codeBlock => {
+      // 校验是否overflow
+      if (codeBlock.scrollHeight <= codeBlock.clientHeight) {
+        return;
+      }
+      // 元素初始化
+      // codeMoreBox
+      let codeMoreBox = document.createElement('div');
+      codeMoreBox.classList.add('code-more-box');
+      // codeMoreBtn
+      let codeMoreBtn = document.createElement('span');
+      codeMoreBtn.classList.add('code-more-btn');
+      codeMoreBtn.addEventListener('click', () => {
+        codeBlock.classList.add('code-show');
+        codeMoreBox.style.display = 'none';
+        // 触发resize事件，重新计算目录位置
+        window.dispatchEvent(new Event('resize'))
+      })
+      // img
+      let img = document.createElement('img');
+      img.classList.add('code-more-img');
+      img.src = {{ (resources.Get "icons/codeMore.png").Permalink }}
+      // 元素添加
+      codeMoreBtn.appendChild(img);
+      codeMoreBox.appendChild(codeMoreBtn);
+      codeBlock.appendChild(codeMoreBox)
+    })
+  }
+  
+  initCodeMoreBox();
+</script>
+
+
+<!-- ===== 友链页：随机排序 + 按名称搜索 ===== -->
+
+<style>
+  /* ===== 友链：搜索框 ===== */
+  .friend-search-wrap {
+    margin: 1.2rem 0 0.8rem;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;      /* 整体靠右 */
+    gap: 0.45rem;
+  }
+
+  .friend-search-box {
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: 100%;
+    max-width: 22rem;           /* 收窄：不再整行铺满 */
+  }
+
+  .friend-search-input {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 0.42rem 2rem 0.42rem 2.1rem;   /* 内边距缩小 */
+    font-size: 1.2rem;                       /* 字号缩小 */
+    color: var(--card-text-color-main);
+    background: var(--card-background);
+    border: 1px solid var(--card-separator-color, rgba(128, 128, 128, 0.25));
+    border-radius: 999px;
+    outline: none;
+    transition: border-color 0.25s ease, box-shadow 0.25s ease;
+  }
+
+  .friend-search-input:focus {
+    border-color: var(--accent-color, #3b82f6);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+  }
+
+  .friend-search-icon {
+    position: absolute;
+    left: 0.85rem;
+    width: 1.5rem;
+    height: 1.5rem;
+    opacity: 0.5;
+    pointer-events: none;
+    color: var(--card-text-color-secondary);
+  }
+
+  .friend-search-clear {
+    position: absolute;
+    right: 0.6rem;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    width: 1.8rem;
+    height: 1.8rem;
+    padding: 0;
+    font-size: 1.4rem;
+    line-height: 1;
+    color: var(--card-text-color-secondary);
+    background: transparent;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+  }
+
+  .friend-search-clear:hover {
+    background: rgba(128, 128, 128, 0.15);
+  }
+
+  .friend-search-wrap.has-value .friend-search-clear {
+    display: flex;
+  }
+
+  .friend-search-meta {
+    font-size: 1.2rem;
+    color: var(--card-text-color-tertiary);
+  }
+
+  /* 搜索无结果提示 */
+  .friend-search-empty {
+    display: none;
+    padding: 2rem 0;
+    text-align: center;
+    font-size: 1.4rem;
+    color: var(--card-text-color-tertiary);
+  }
+
+  .friend-search-empty.is-on {
+    display: block;
+  }
+
+  /* 打乱顺序时的轻微淡入，避免生硬跳动 */
+  .article-list--compact.links > article {
+    transition: opacity 0.18s ease;
+  }
+
+  .article-list--compact.links.is-filtering > article.is-matched {
+    opacity: 1;
+  }
+</style>
+
+<script>
+  (function () {
+    "use strict";
+
+    // ========== 1. 洗牌：Fisher-Yates，每次进入页面顺序都不同 ==========
+    function shuffle(arr) {
+      for (var i = arr.length - 1; i > 0; i--) {
+        var j = Math.floor(Math.random() * (i + 1));
+        var t = arr[i];
+        arr[i] = arr[j];
+        arr[j] = t;
+      }
+      return arr;
+    }
+
+    // ========== 2. 初始化友链：搜索框 + 随机排序 ==========
+    function initFriendSearch() {
+      var list = document.querySelector(".article-list--compact.links");
+      if (!list) return;                       // 不是友链页，直接返回
+      if (list.dataset.friendReady === "1") return;  // 已初始化，避免重复
+      list.dataset.friendReady = "1";
+
+      var cards = Array.prototype.slice.call(list.querySelectorAll(":scope > article"));
+      if (!cards.length) return;
+
+      // ---- 记录每张卡片的搜索名（取标题文字） ----
+      cards.forEach(function (card) {
+        var titleEl = card.querySelector(".article-title");
+        var name = titleEl ? titleEl.textContent.trim() : "";
+        card.dataset.name = (name + " " + (card.getAttribute("data-name") || ""))
+          .toLowerCase().trim();
+      });
+
+      // ---- 随机打乱顺序 ----
+      shuffle(cards).forEach(function (card) {
+        list.appendChild(card);
+      });
+
+      // ---- 构造搜索框 ----
+      var wrap = document.createElement("div");
+      wrap.className = "friend-search-wrap";
+      wrap.innerHTML =
+        '<div class="friend-search-box">' +
+          '<svg class="friend-search-icon" viewBox="0 0 24 24" fill="none" ' +
+            'stroke="currentColor" stroke-width="2" stroke-linecap="round">' +
+            '<circle cx="11" cy="11" r="7"></circle>' +
+            '<line x1="16.5" y1="16.5" x2="21" y2="21"></line>' +
+          '</svg>' +
+          '<input type="text" class="friend-search-input" ' +
+            'placeholder="搜名字找友链，比如输入自己的博客名" ' +
+            'autocomplete="off" spellcheck="false" aria-label="搜索友链">' +
+          '<button type="button" class="friend-search-clear" aria-label="清空">×</button>' +
+        '</div>' +
+        '<div class="friend-search-meta"></div>';
+
+      var empty = document.createElement("div");
+      empty.className = "friend-search-empty";
+      empty.textContent = "没有找到这个友链，换个关键词试试～";
+
+      list.parentNode.insertBefore(wrap, list);
+      list.parentNode.insertBefore(empty, list.nextSibling);
+
+      var input = wrap.querySelector(".friend-search-input");
+      var clearBtn = wrap.querySelector(".friend-search-clear");
+      var meta = wrap.querySelector(".friend-search-meta");
+      var total = cards.length;
+
+      // ---- 过滤 ----
+      function apply() {
+        var kw = input.value.trim().toLowerCase();
+        wrap.classList.toggle("has-value", kw.length > 0);
+        list.classList.toggle("is-filtering", kw.length > 0);
+
+        var shown = 0;
+        cards.forEach(function (card) {
+          var hit = !kw || (card.dataset.name || "").indexOf(kw) !== -1;
+          card.style.display = hit ? "" : "none";
+          card.classList.toggle("is-matched", hit);
+          if (hit) shown++;
+        });
+
+        empty.classList.toggle("is-on", shown === 0);
+        meta.textContent = kw
+          ? "找到 " + shown + " / " + total + " 个友链"
+          : "共 " + total + " 个友链 · 顺序每次进入都会打乱";
+      }
+
+      input.addEventListener("input", apply);
+      input.addEventListener("keydown", function (e) {
+        if (e.key === "Enter") e.preventDefault();
+        if (e.key === "Escape") {
+          input.value = "";
+          apply();
+        }
+      });
+      clearBtn.addEventListener("click", function () {
+        input.value = "";
+        apply();
+        input.focus();
+      });
+
+      apply();
+    }
+
+    // ========== 3. 首次加载 + PJAX 切换后都执行 ==========
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", initFriendSearch);
+    } else {
+      initFriendSearch();
+    }
+    document.addEventListener("pjax:complete", initFriendSearch);
+  })();
+</script>

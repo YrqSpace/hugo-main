@@ -1,7 +1,224 @@
-{{/* 全站 Cloudflare Turnstile 人机验证已于 2026-11-04 移除。 */}}
-{{/* 原因：它把 .loading 遮罩（position:fixed;height:100%;z-index:99）的 */}}
-{{/* 消失条件绑在验证回调上，遮罩盖住首屏，导致 LCP 直到验证通过才开始计。 */}}
-{{/* 保留下方首页封面图 preload，原有优化不变。 */}}
+{{/* 加载动画：uiverse 横向进度条 loader（satyamchaudharydev / red-cow-21, MIT）。 */}}
+{{/* Cloudflare Turnstile 全站人机验证已于 2026-11-04 移除。 */}}
+{{/* 原因：原先遮罩（position:fixed;height:100%;z-index:99）的消失条件绑在 */}}
+{{/* 验证回调上，遮罩盖住首屏，导致 LCP 直到验证通过才开始计（实测卡在 3.1s）。 */}}
+{{/* 现在遮罩只负责首屏动画：资源就绪后自行淡出，不再等待任何人机验证。 */}}
+{{/* 同一标签页会话内只播放一次（sessionStorage: loading-shown）。 */}}
+
+<script>
+    (function () {
+        var KEY = 'loading-shown';
+        var seen = false;
+        try { seen = sessionStorage.getItem(KEY) === '1'; } catch (e) { seen = false; }
+        // 本会话已播放过：直接跳过遮罩，避免二次进入被动画挡住
+        if (seen) {
+            document.documentElement.classList.add('loading-skip');
+        } else {
+            document.documentElement.classList.add('is-loading');
+        }
+    })();
+</script>
+
+<div class="loading">
+    <div class="loading-bar"></div>
+</div>
+
+<style>
+    .loading {
+        position: fixed;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 99;
+        /* 跟随主题变量（hugo-theme-stack 的 --body-background），自带亮色兜底 */
+        background-color: var(--body-background, #f5f5fa);
+        /* 渐隐淡出动画 */
+        transition: opacity 0.3s ease;
+    }
+
+    /* 淡出状态：遮罩渐隐 */
+    .loading.is-hidden {
+        opacity: 0;
+        pointer-events: none;
+    }
+
+    /* 本会话已播放过：直接不显示加载遮罩 */
+    html.loading-skip .loading {
+        display: none !important;
+    }
+
+    /* 明暗模式兜底（当主题变量不可用时也能正确配色） */
+    html[data-scheme="light"] .loading {
+        background-color: #f5f5fa;
+    }
+    html[data-scheme="dark"] .loading {
+        background-color: #303030;
+    }
+    @media (prefers-color-scheme: dark) {
+        .loading {
+            background-color: #303030;
+        }
+    }
+
+    /*
+     * 遮罩期间隐藏音乐播放器：
+     * 播放器照常在后台初始化/预加载，只是不显示、不拦截点击。
+     * 遮罩淡出时移除 html.is-loading，播放器淡入出现。
+     */
+    html.is-loading .aplayer {
+        opacity: 0 !important;
+        visibility: hidden !important;
+        pointer-events: none !important;
+    }
+    /* 播放器出现时的过渡 */
+    .aplayer {
+        transition: opacity 0.4s ease;
+    }
+
+    /*
+     * 进度条 loader —— 样式取自 uiverse.io/satyamchaudharydev/red-cow-21（MIT）
+     * 只改了类名（.loader -> .loading-bar），避免和主题里可能存在的 .loader 撞车。
+     */
+    .loading-bar {
+        display: block;
+        --height-of-loader: 4px;
+        --loader-color: #0071e2;
+        width: 130px;
+        height: var(--height-of-loader);
+        border-radius: 30px;
+        background-color: rgba(0, 0, 0, 0.2);
+        position: relative;
+    }
+
+    .loading-bar::before {
+        content: "";
+        position: absolute;
+        background: var(--loader-color);
+        top: 0;
+        left: 0;
+        width: 0%;
+        height: 100%;
+        border-radius: 30px;
+        animation: loading-moving 1s ease-in-out infinite;
+    }
+
+    @keyframes loading-moving {
+        50% {
+            width: 100%;
+        }
+
+        100% {
+            width: 0;
+            right: 0;
+            left: unset;
+        }
+    }
+</style>
+
+<script>
+    function initLoading() {
+        var loading = document.querySelector(".loading");
+        if (!loading) {
+            return;
+        }
+        // 本会话已播放过：脚本层面也直接放行，不做任何等待
+        if (document.documentElement.classList.contains("loading-skip")) {
+            return;
+        }
+
+        var hidden = false;
+        // 动画最短展示时间，避免资源极快时进度条一闪而过
+        var minVisibleUntil = Date.now() + 600;
+
+        function hideLoading() {
+            if (hidden) {
+                return;
+            }
+            hidden = true;
+            try { sessionStorage.setItem("loading-shown", "1"); } catch (e) {}
+            loading.classList.add("is-hidden");
+            setTimeout(function () {
+                loading.style.display = "none";
+                // 遮罩结束，音乐播放器淡入出现
+                document.documentElement.classList.remove("is-loading");
+            }, 320);
+        }
+
+        function hideAfterMinDelay() {
+            var wait = Math.max(0, minVisibleUntil - Date.now());
+            setTimeout(hideLoading, wait);
+        }
+
+        // 图片就绪判断（含缓存命中与失败兜底）
+        function whenImageReady(img, callback) {
+            if (!img) {
+                callback();
+                return;
+            }
+            // 强制立即加载，避免 loading="lazy" 导致 load 事件迟迟不触发
+            try { img.loading = "eager"; } catch (e) {}
+            if (img.complete && img.naturalWidth !== 0) {
+                callback();
+                return;
+            }
+            img.addEventListener("load", callback, { once: true });
+            img.addEventListener("error", callback, { once: true });
+        }
+
+        document.addEventListener("DOMContentLoaded", function () {
+            var avatar = document.querySelector(".site-avatar img, img.site-logo");
+            var articles = document.querySelectorAll(".article-list > article, .article-list .article-item");
+            var need = Math.ceil(articles.length / 2);
+
+            var avatarDone = false;
+            var articleDone = 0;
+            var scheduled = false;
+
+            function maybeDone() {
+                if (scheduled) {
+                    return;
+                }
+                if (avatarDone && articleDone >= need) {
+                    scheduled = true;
+                    hideAfterMinDelay();
+                }
+            }
+
+            whenImageReady(avatar, function () {
+                avatarDone = true;
+                maybeDone();
+            });
+
+            if (need === 0) {
+                maybeDone();
+            } else {
+                var counted = 0;
+                Array.prototype.forEach.call(articles, function (article) {
+                    if (counted >= need) {
+                        return;
+                    }
+                    counted++;
+                    whenImageReady(article.querySelector("img"), function () {
+                        articleDone++;
+                        maybeDone();
+                    });
+                });
+            }
+        });
+
+        // 兜底 1：整页 load 完成即放行
+        window.addEventListener("load", hideAfterMinDelay);
+        // 兜底 2：最多 15 秒，避免个别资源异常导致遮罩永不消失
+        setTimeout(hideLoading, 15000);
+    }
+
+    initLoading();
+</script>
 
 {{ if .IsHome }}
   {{ $pages := where site.RegularPages "Type" "in" site.Params.mainSections }}

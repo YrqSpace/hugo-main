@@ -538,41 +538,81 @@ if (!window.__pjaxPagefindFix) {
 </style>
 
 <script>
+(function () {
+  var CODE_MORE_ICON = '{{ (resources.Get "icons/codeMore.png").Permalink }}';
+
   function initCodeMoreBox() {
-    let codeBlocks = document.querySelectorAll(".highlight");
-    if (!codeBlocks) {
+    var codeBlocks = document.querySelectorAll(".highlight");
+    if (!codeBlocks || !codeBlocks.length) {
       return;
     }
-    codeBlocks.forEach(codeBlock => {
-      // 校验是否overflow
-      if (codeBlock.scrollHeight <= codeBlock.clientHeight) {
+    codeBlocks.forEach(function (codeBlock) {
+      // 已处理过就跳过：PJAX 反复触发时不重复插入按钮
+      if (codeBlock.dataset.codeMoreReady === '1') {
         return;
       }
-      // 元素初始化
+      // 校验是否真的溢出。+1 容忍亚像素取整误差
+      if (codeBlock.scrollHeight <= codeBlock.clientHeight + 1) {
+        codeBlock.dataset.codeMoreReady = '1';
+        return;
+      }
+      codeBlock.dataset.codeMoreReady = '1';
+
       // codeMoreBox
-      let codeMoreBox = document.createElement('div');
+      var codeMoreBox = document.createElement('div');
       codeMoreBox.classList.add('code-more-box');
+
       // codeMoreBtn
-      let codeMoreBtn = document.createElement('span');
+      var codeMoreBtn = document.createElement('span');
       codeMoreBtn.classList.add('code-more-btn');
-      codeMoreBtn.addEventListener('click', () => {
+      codeMoreBtn.addEventListener('click', function () {
         codeBlock.classList.add('code-show');
         codeMoreBox.style.display = 'none';
-        // 触发resize事件，重新计算目录位置
-        window.dispatchEvent(new Event('resize'))
-      })
+        // 触发 resize 事件，重新计算目录位置
+        window.dispatchEvent(new Event('resize'));
+      });
+
       // img
-      let img = document.createElement('img');
+      var img = document.createElement('img');
       img.classList.add('code-more-img');
-      img.src = {{ (resources.Get "icons/codeMore.png").Permalink }}
+      img.src = CODE_MORE_ICON;
+
       // 元素添加
       codeMoreBtn.appendChild(img);
       codeMoreBox.appendChild(codeMoreBtn);
-      codeBlock.appendChild(codeMoreBox)
-    })
+      codeBlock.appendChild(codeMoreBox);
+    });
   }
-  
-  initCodeMoreBox();
+
+  /* 等代码字体真正就位后再测量高度。
+     字体没加载完时浏览器用后备字体渲染，行高偏小，
+     会让本该折叠的代码块被误判成"内容没溢出"，
+     于是同一篇文章刷新前后按钮时有时无。 */
+  function scheduleCodeMoreBox() {
+    var run = function () { initCodeMoreBox(); };
+    if (document.fonts && document.fonts.ready && document.fonts.ready.then) {
+      document.fonts.ready.then(function () {
+        requestAnimationFrame(function () { setTimeout(run, 0); });
+      });
+    } else {
+      requestAnimationFrame(function () { setTimeout(run, 0); });
+    }
+  }
+
+  window.initCodeMoreBox = initCodeMoreBox;
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', scheduleCodeMoreBox);
+  } else {
+    scheduleCodeMoreBox();
+  }
+
+  /* PJAX 软导航只替换 .main-container，本脚本不会重新执行。
+     不在这里补挂，从列表页点进文章时新代码块就永远没有展开按钮，
+     只有整页刷新（F5）才会出现。 */
+  document.addEventListener('pjax:complete', scheduleCodeMoreBox);
+  document.addEventListener('pjax:end', scheduleCodeMoreBox);
+})();
 </script>
 
 

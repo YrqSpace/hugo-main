@@ -1,0 +1,136 @@
+name: Build and Deploy
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pages-deploy
+  cancel-in-progress: true
+
+env:
+  HUGO_VERSION: "0.131.0"
+  PAGEFIND_VERSION: "1.1.0"
+  SITE_HOST: "tinkerlog.dpdns.org"
+  # 这个 key 就是 static/ 里那个同名 txt 文件名，仓库内公开，无需保密
+  INDEXNOW_KEY_FALLBACK: "0c7e1345b5e0550696739356a8e66b7c"
+
+jobs:
+  build-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Hugo
+        uses: peaceiris/actions-hugo@v3
+        with:
+          hugo-version: ${{ env.HUGO_VERSION }}
+          extended: true
+
+      - name: Build site
+        run: |
+          hugo --gc
+          echo "---- public top ----"
+          ls public | head -20
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Build search index
+        run: |
+          # 读取仓库根目录的 pagefind.yml（site=public, output_path=public/pagefind, force_language=zh）
+          npx --yes pagefind@${{ env.PAGEFIND_VERSION }}
+          echo "---- pagefind ----"
+          ls public/pagefind | head -15
+
+      - name: Verify build output
+        run: |
+          set -e
+          test -f public/index.html        || { echo "MISSING public/index.html";        exit 1; }
+          test -f public/pagefind/pagefind.js || { echo "MISSING pagefind/pagefind.js"; exit 1; }
+          test -f public/CNAME             || { echo "MISSING public/CNAME";             exit 1; }
+          echo "CNAME = $(cat public/CNAME)"
+          touch public/.nojekyll
+          echo "OK: build artifacts verified"
+
+      - name: Check deploy key
+        env:
+          KEY: ${{ secrets.PAGES_DEPLOY_KEY }}
+        run: |
+          if [ -z "$KEY" ]; then
+            echo "缺少 PAGES_DEPLOY_KEY。"
+            echo "请在 hugo-main -> Settings -> Secrets and variables -> Actions 里添加，"
+            echo "内容为 deploy key 的私钥（YrqSpace.github.io 仓库的 Deploy keys，需勾选 Allow write access）。"
+            exit 1
+          fi
+          echo "deploy key present (length ${#KEY})"
+
+      - name: Deploy to Pages repository
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          deploy_key: ${{ secrets.PAGES_DEPLOY_KEY }}
+          external_repository: YrqSpace/YrqSpace.github.io
+          publish_branch: master
+          publish_dir: ./public
+          force_orphan: true
+          user_name: github-actions[bot]
+          user_email: 41898282+github-actions[bot]@users.noreply.github.com
+          commit_message: "site update"
+
+      - name: Wait for Pages to publish
+        run: sleep 60
+
+      - name: Submit to IndexNow
+        env:
+          INDEXNOW_KEY: ${{ secrets.INDEXNOW_KEY }}
+        run: |
+          set -u
+          KEY="${INDEXNOW_KEY:-$INDEXNOW_KEY_FALLBACK}"
+          BASE="https://${SITE_HOST}"
+
+          if ! curl -sf --max-time 15 "$BASE/$KEY.txt" > /dev/null; then
+            echo "key file unreachable: $BASE/$KEY.txt — skip IndexNow"
+            exit 0
+          fi
+
+          curl -sf --max-time 30 "$BASE/sitemap.xml" -o sitemap.xml || {
+            echo "cannot fetch sitemap — skip IndexNow"
+            exit 0
+          }
+
+          grep -oP '(?<=<loc>)[^<]+' sitemap.xml | tr -d '\r' > urls.txt
+          COUNT=$(wc -l < urls.txt)
+          echo "URL count: $COUNT"
+          if [ "$COUNT" -eq 0 ]; then
+            echo "sitemap empty — skip IndexNow"
+            exit 0
+          fi
+
+          head -10000 urls.txt | jq -R . | jq -s \
+            --arg host "$SITE_HOST" \
+            --arg key "$KEY" \
+            '{host:$host, key:$key, keyLocation:("https://"+$host+"/"+$key+".txt"), urlList:.}' \
+            > payload.json
+
+          CODE=$(curl -s -o resp.txt -w '%{http_code}' --max-time 30 \
+            -X POST "https://api.indexnow.org/indexnow" \
+            -H "Content-Type: application/json; charset=utf-8" \
+            --data-binary @payload.json)
+
+          echo "IndexNow HTTP $CODE"
+          cat resp.txt || true
+          case "$CODE" in
+            200|202) echo "IndexNow accepted ($COUNT urls submitted)" ;;
+            *)       echo "IndexNow returned $CODE (non-fatal, deploy already done)" ;;
+          esac

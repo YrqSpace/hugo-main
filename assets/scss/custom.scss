@@ -406,3 +406,99 @@
     color: var(--accent-color);
   }
 }
+
+
+/* ===== 自定义右键菜单（仅正文区域生效） ===== */
+.ctx-menu {
+  position: fixed;
+  z-index: 9999;
+  min-width: 178px;
+  padding: 6px;
+  margin: 0;
+  list-style: none;
+  border-radius: 9px;
+  background: var(--card-background, #fff);
+  color: var(--card-text-color-main, #222);
+  border: 1px solid var(--card-separator-color, rgba(128, 128, 128, 0.25));
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.16);
+  font-size: 1.4rem;
+  line-height: 1.4;
+  user-select: none;
+  -webkit-user-select: none;
+  animation: ctx-menu-in 0.12s ease-out;
+}
+@keyframes ctx-menu-in {
+  from { opacity: 0; transform: scale(0.96); }
+  to   { opacity: 1; transform: scale(1); }
+}
+.ctx-menu[hidden] { display: none; }
+.ctx-menu li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.ctx-menu li:hover { background: rgba(128, 128, 128, 0.14); }
+.ctx-menu li.sep {
+  height: 1px;
+  margin: 4px 8px;
+  padding: 0;
+  background: var(--card-separator-color, rgba(128, 128, 128, 0.25));
+  border-radius: 0;
+  cursor: default;
+}
+.ctx-menu li.sep:hover { background: var(--card-separator-color, rgba(128, 128, 128, 0.25)); }
+.ctx-menu .ctx-hint {
+  margin-left: auto;
+  padding-left: 10px;
+  font-size: 1.1rem;
+  opacity: 0.5;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  max-width: 8em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+/* ===== context-menu 扩展：禁用项 / 快捷键标记 / 提示条（2026-11 全站版） ===== */
+.ctx-menu { min-width: 200px; }
+.ctx-menu li.is-active { background: rgba(128, 128, 128, 0.14); }
+.ctx-menu li.ctx-disabled {
+  opacity: 0.38;
+  cursor: not-allowed;
+}
+.ctx-menu li.ctx-disabled:hover { background: transparent; }
+.ctx-menu .ctx-kbd {
+  margin-left: auto;
+  padding-left: 16px;
+  font-size: 1.1rem;
+  opacity: 0.45;
+  white-space: nowrap;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+.ctx-toast {
+  position: fixed;
+  left: 50%;
+  bottom: 42px;
+  transform: translate(-50%, 12px);
+  z-index: 9999;
+  padding: 8px 16px;
+  border-radius: 999px;
+  font-size: 1.3rem;
+  line-height: 1.5;
+  color: #fff;
+  background: rgba(24, 24, 27, 0.92);
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.24);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.18s ease, transform 0.18s ease;
+}
+.ctx-toast.is-show {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+@media (prefers-reduced-motion: reduce) {
+  .ctx-toast { transition: none; }
+}

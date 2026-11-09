@@ -831,3 +831,11 @@ if (!window.__pjaxPagefindFix) {
     document.addEventListener("pjax:complete", initFriendSearch);
   })();
 </script>
+
+<!-- ===== 自定义右键菜单（全站生效）===== -->
+{{- $posts := where .Site.RegularPages "Section" "post" -}}
+{{- $posts = first 200 $posts -}}
+<script>
+window.__POSTS__ = [{{ range $i, $p := $posts }}{{ if $i }},{{ end }}"{{ $p.RelPermalink }}"{{ end }}];
+</script>
+<script src="{{ "js/context-menu.js" | relURL }}" defer></script>

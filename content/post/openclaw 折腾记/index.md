@@ -1,7 +1,7 @@
 ---
 title: openclaw 折腾记
 date: 2026-11-19
-draft: true
+draft: false
 tags:
     - OpenClaw
     - GLM

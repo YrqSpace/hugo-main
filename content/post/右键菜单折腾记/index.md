@@ -2,7 +2,6 @@
 title: 给 Hugo 博客加自定义右键菜单：作用域、剪贴板和键盘事件
 date: 2026-11-10
 slug: 右键菜单折腾记
-image: https://image.tinkerlog.dpdns.org/2026/11/2026-11-10-cover.jpg
 tags:
     - Hugo
     - 前端

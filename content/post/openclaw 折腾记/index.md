@@ -1,6 +1,6 @@
 ---
 title: openclaw 折腾记
-date: 2026-11-19 17:42:02
+date: 2026-11-19
 draft: true
 tags:
     - OpenClaw

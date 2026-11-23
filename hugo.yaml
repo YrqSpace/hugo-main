@@ -207,6 +207,13 @@ menu:
           params:
               icon: train
               newTab: true
+        - identifier: OpenList
+          name: 博客资源
+          url: https://cloud.tinkerlog.dpdns.org/
+          weight: 99
+          params:
+              icon: https://res.oplist.org/logo/logo.svg
+              newTab: true
 
 
     social:
